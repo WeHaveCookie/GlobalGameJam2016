@@ -12,7 +12,12 @@ Controller::Controller(sf::RenderWindow* window, Character* character, FireWall*
     // LOAD MAP FOR TESTING
     m_level = new Level(levelPath+"level.lvl");
     m_engine->setMap(m_level);
-
+    m_mainThemeMusic = new sf::Music();
+    if (!m_mainThemeMusic->openFromFile(soundPath+"MainTheme.ogg"))
+    {
+        std::cout << "Unable to load " << soundPath+"MainTheme.ogg" <<std::endl;
+        //RAISE ERROR
+    }
     //ctor
 }
 
@@ -22,6 +27,11 @@ Controller::~Controller()
     delete m_player;
     delete m_fireWall;
     delete m_menu;
+    delete m_level;
+    delete m_engine;
+    m_mainThemeMusic->stop();
+    delete m_mainThemeMusic;
+
     //dtor        sf::RenderWindow* m_window;
 }
 
@@ -39,6 +49,9 @@ int Controller::start()
 	sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
 	sf::Time duration = sf::Time::Zero;
 
+    m_mainThemeMusic->setVolume(100);
+    m_mainThemeMusic->setLoop(true);
+    //m_mainThemeMusic.play();
     while (m_window->isOpen())
     {
         // On catch les events
@@ -60,22 +73,6 @@ int Controller::start()
                             case sf::Keyboard::A :
                                 m_displayMenu = true;
                                 break;
-                            /*case sf::Keyboard::Right :
-                                std::cout << "Catch Right" << std::endl;
-                                m_engine->move(m_player,sf::Vector2f(1.0,0.0));
-                                break;
-                            case sf::Keyboard::Left :
-                                std::cout << "Catch Left" << std::endl;
-                                m_engine->move(m_player,sf::Vector2f(-1.0,0.0));
-                                break;
-                            case sf::Keyboard::Up :
-                                std::cout << "Catch Up" << std::endl;
-                                m_engine->move(m_player,sf::Vector2f(0.0,-1.0));
-                                break;
-                            case sf::Keyboard::Down :
-                                std::cout << "Catch Down" << std::endl;
-                                m_engine->move(m_player,sf::Vector2f(0.0,1.0));
-                                break;*/
                             default :
                                 break;
                         }
@@ -102,6 +99,10 @@ int Controller::start()
                                         m_displayMenu = false;
                                         std::cout << "load level : " << m_selectedLevel << std::endl;
                                     }
+                                } else
+                                {
+                                    std::cout << " x : " << m_level->getCaseAt(m_player->getPositionInWorld()).getPosition().x << " y : " << m_level->getCaseAt(m_player->getPositionInWorld()).getPosition().y << std::endl;
+                                    std::cout << " char x : " << m_player->getSprite().getPosition().x << " y : " << m_player->getSprite().getPosition().y << std::endl;
                                 }
                             break;
                         case sf::Mouse::Right:
@@ -126,26 +127,7 @@ int Controller::start()
 
 
         /** AJOUT DE CODE**/
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        {
-            //std::cout << "Catch Right" << std::endl;
-            m_engine->move(m_player,sf::Vector2f(1.0,0.0));
-        }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        {
-            m_engine->move(m_player,sf::Vector2f(-1.0,0.0));
-        }
-
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        {
-            m_engine->move(m_player,sf::Vector2f(0.0,-1.0));
-        }
-
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        {
-            m_engine->move(m_player,sf::Vector2f(0.0,1.0));
-        }
 
         if (sf::Joystick::isButtonPressed(0, 0)){//"A" button on the XBox 360 controller
             //turbo = 2;
@@ -181,10 +163,11 @@ int Controller::start()
                 //CHECK DEAD ZONES - OTHERWISE INPUT WILL RESULT IN JITTERY MOVEMENTS WHEN NO INPUT IS PROVIDED
                 //INPUT RANGES FROM -100 TO 100
                 //A 15% DEAD ZONE SEEMS TO WORK FOR ME - GIVE THAT A SHOT
-                if (speed.x > 15.f || speed.x < -15.f || speed.y > 15.f || speed.y < -15.f)
+                if (speed.x > 60.f || speed.x < -60.f || speed.y > 60.f || speed.y < -60.f)
                 {
-                    //m_player->move(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(), turbo*speed.y*TimePerFrame.asSeconds()));
                     m_engine->move(m_player,sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(), turbo*speed.y*TimePerFrame.asSeconds()));
+                    std::cout << "Get rune at " << m_player->getPositionInWorld() << " x=" << m_player->getSprite().getPosition().x << " y=" << m_player->getSprite().getPosition().y <<std::endl;
+
                 }
             }
 
@@ -195,18 +178,20 @@ int Controller::start()
             float decPlayer = m_player->getSprite().getGlobalBounds().left - m_view.getCenter().x;
             if((m_view.getSize().x/2) + decPlayer > (m_view.getSize().x*0.66))
             {
-                // m_view.move(sf::Vector2f(SPRITE_WIDTH,0));
+                m_view.move(sf::Vector2f(m_player->getSpeed()*2.0,0));
                 //m_engine->move(m_fireWall,sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
             }
-            m_view.move(1,0);
+            //m_view.move(1,0);
             m_window->setView(m_view);
-            m_level->drawMap(m_window);
+            m_level->drawMap(m_window,m_view);
             m_player->draw(m_window);
             //m_fireWall->draw(m_window);
 
         }
         m_window->display();
     }
+    m_mainThemeMusic->stop();
+    delete m_mainThemeMusic;
 }
 
 void Controller::setLevel(std::string path)

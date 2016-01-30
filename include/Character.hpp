@@ -4,6 +4,8 @@
 #include "Constante.hpp"
 #include "DrawableObject.hpp"
 #include "Structure.hpp"
+#include "Rune.hpp"
+#include "Case.hpp"
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -15,15 +17,16 @@ public:
     void draw(sf::RenderWindow* window);
     void update(sf::RenderWindow* window);
     void move(sf::Vector2f motion);
-    /*void jump(sf::Vector2f motion, Quadtree* universe);*/
+    void updateAnimation();
     inline sf::Sprite getSprite() {return m_sprite;}
-    inline int getPositionInWorld() {return m_positionInWorld;}
     inline void setAlive(bool b) {m_alive = b;}
     inline void setSpeed(float f) {m_speed = f;}
+    inline float getSpeed() {return m_speed;}
     virtual ~Character();
 protected:
 private:
     void updatePosition();
+    void build();
     sf::Texture m_texture;
     sf::Sprite m_sprite;
     sf::Vector2f m_position;
@@ -33,8 +36,16 @@ private:
     bool m_alive;
     bool m_onMove;
     MovingState m_movingState;
+    std::vector<sf::Sprite> m_animationLEFT;
+    std::vector<sf::Sprite> m_animationRIGHT;
+    std::vector<sf::Sprite> m_animationUP;
+    std::vector<sf::Sprite> m_animationDOWN;
+    std::vector<sf::Sprite> m_animationIDLE;
 
-    //int m_positionInWorld;
+    int m_animationCounter;
+    sf::Time m_timeSinceLastUpdate;
+	sf::Time m_TimePerFrame;
+	sf::Time m_duration;
 };
 
 #endif // CHARACTER_HPP

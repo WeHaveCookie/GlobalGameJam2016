@@ -13,6 +13,8 @@ Engine::Engine()
 
 Engine::~Engine()
 {
+
+    delete m_level;
     //dtor
 }
 
@@ -58,8 +60,6 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion)
         std::cout << "*  ENGINE : MOVE  *" << std::endl;
         std::cout << "*-----------------*" << std::endl;
     }
-    //std::cout << "Motion x : " << motion.x << " Motion y : " << motion.y << std::endl;
-    //std::cout << "Try to move" << std::endl;
     sf::Vector2f realMotion;
     if(abs(motion.x) > abs(motion.y))
     {
@@ -86,33 +86,7 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion)
             realMotion.y = 0.0f;
         }
     }
-
-    /*if(motion.x > 1)
-    {
-        realMotion.x = 1.0f;
-    } else if (motion.x < -1)
-    {
-        realMotion.x = -1.0f;
-    } else
-    {
-        realMotion.x = 0.0f;
-    }
-    if(motion.y > 1)
-    {
-        realMotion.y = 1.0f;
-    } else if (motion.y < -1)
-    {
-        realMotion.y = -1.0f;
-    } else
-    {
-        realMotion.y = 0.0f;
-    }*/
-
     int initPos = obj->getPositionInWorld();
-    /*std::cout << "Pos init : " << initPos << std::endl;
-    std::cout << "RealMotion.x : " << realMotion.x << std::endl;
-    std::cout << "RealMotion.y : " << realMotion.y << std::endl;
-    std::cout << "Realy+PATTERN : " << realMotion.y*PATTERN_WIDTH << std::endl;*/
     int newPosition = initPos + realMotion.x + realMotion.y*(PATTERN_WIDTH*PATTERN_NBR);
     //std::cout << "Type : " << m_level->getTypeOfLevelCasesAt(newPosition) << std::endl;
     if(m_level->getTypeOfLevelCasesAt(newPosition) == TileType::BLOCKING)

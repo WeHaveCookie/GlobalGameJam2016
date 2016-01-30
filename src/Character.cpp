@@ -17,6 +17,7 @@ Character::Character(std::string path)
     if(!m_texture.loadFromFile(defaultCharPath+path)){
         //RAISE A LOAD TEXTURE EXCEPTION
     }
+    m_texture.setSmooth(true);
     m_sprite.setTexture(m_texture);
     m_sprite.setTextureRect(sf::IntRect(0,0,64,64));
     //m_sprite.setScale(0.5,0.5);
@@ -29,6 +30,7 @@ Character::Character(std::string path)
     m_alive = true;
     m_onMove = false;
     m_movingState = MovingState::IDLE;
+    build();
 }
 
 /**
@@ -78,13 +80,18 @@ void Character::update(sf::RenderWindow* window)
             updatePosition();
             m_sprite.setPosition(m_position);
         }
+        if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
+        {
+            updateAnimation();
+        } else {
+            m_timeSinceLastUpdate += m_TimePerFrame;
+        }
     } else
     {
         //std::cout << "Player Dead" << std::endl;
     }
 
 }
-
 /**
 * \fn move(sf::Vector2f motion, Quadtree* universe)
 *
@@ -169,6 +176,7 @@ void Character::updatePosition()
             default:
                 break;
         }
+        m_animationCounter = 0;
         m_movingState = MovingState::IDLE;
         m_onMove = false;
         m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
@@ -176,3 +184,139 @@ void Character::updatePosition()
 
 }
 
+void Character::build()
+{
+    //std::cout << "build char" << std::endl;
+    sf::Sprite sprite;
+    m_texture.setSmooth(true);
+    sprite.setTexture(m_texture);
+    // Set animation IDLE
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,0,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationIDLE.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*1,0,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationIDLE.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*2,0,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationIDLE.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*3,0,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationIDLE.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*4,0,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationIDLE.push_back(sprite);
+
+    // Set animation UP
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,SPRITE_HEIGHT,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationUP.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*1,SPRITE_HEIGHT,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationUP.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*2,SPRITE_HEIGHT,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationUP.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*3,SPRITE_HEIGHT,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationUP.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*4,SPRITE_HEIGHT,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationUP.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*5,SPRITE_HEIGHT,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationUP.push_back(sprite);
+
+    // set animation RIGHT
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationRIGHT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*1,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationRIGHT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*2,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationRIGHT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*3,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationRIGHT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*4,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationRIGHT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*5,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationRIGHT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*6,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationRIGHT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*7,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationRIGHT.push_back(sprite);
+
+    // set animation LEFT
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,SPRITE_HEIGHT*3,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationLEFT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*1,SPRITE_HEIGHT*3,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationLEFT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*2,SPRITE_HEIGHT*3,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationLEFT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*3,SPRITE_HEIGHT*3,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationLEFT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*4,SPRITE_HEIGHT*3,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationLEFT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*5,SPRITE_HEIGHT*3,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationLEFT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*6,SPRITE_HEIGHT*3,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationLEFT.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*7,SPRITE_HEIGHT*3,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationLEFT.push_back(sprite);
+
+    // set animation DOWN
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,SPRITE_HEIGHT*4,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDOWN.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*1,SPRITE_HEIGHT*4,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDOWN.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*2,SPRITE_HEIGHT*4,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDOWN.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*3,SPRITE_HEIGHT*4,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDOWN.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*4,SPRITE_HEIGHT*4,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDOWN.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*5,SPRITE_HEIGHT*4,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDOWN.push_back(sprite);
+    m_animationCounter = 0;
+
+    sf::Clock tickClock;
+	m_timeSinceLastUpdate = sf::Time::Zero;
+	m_TimePerFrame = sf::seconds(1.f / 60.f);
+	m_duration = sf::seconds(0.1);
+	//std::cout << "TimeSince : " << m_timeSinceLastUpdate.asSeconds() << " TimeFrame : " << m_TimePerFrame.asSeconds() << " duration : " << m_duration.asSeconds() << std::endl;
+    //std::cout << "build success" << std::endl;
+}
+
+void Character::updateAnimation()
+{
+    m_timeSinceLastUpdate = sf::Time::Zero;
+    //std::cout << "Update Animation " << m_movingState << " counter : " << m_animationCounter << std::endl;
+    switch(m_movingState)
+    {
+        case MovingState::IDLE:
+            m_sprite.setTextureRect(m_animationIDLE[m_animationCounter].getTextureRect());
+            if(++m_animationCounter >= m_animationIDLE.size())
+            {
+                m_animationCounter = 0;
+            }
+            break;
+        case MovingState::UP:
+            m_sprite.setTextureRect(m_animationUP[m_animationCounter].getTextureRect());
+            if(++m_animationCounter >= m_animationUP.size())
+            {
+                m_animationCounter = 0;
+            }
+            break;
+        case MovingState::RIGHT:
+            m_sprite.setTextureRect(m_animationRIGHT[m_animationCounter].getTextureRect());
+            if(++m_animationCounter >= m_animationRIGHT.size())
+            {
+                m_animationCounter = 0;
+            }
+            break;
+        case MovingState::LEFT:
+            m_sprite.setTextureRect(m_animationLEFT[m_animationCounter].getTextureRect());
+            if(++m_animationCounter >= m_animationLEFT.size())
+            {
+                m_animationCounter = 0;
+            }
+            break;
+        case MovingState::DOWN:
+            m_sprite.setTextureRect(m_animationDOWN[m_animationCounter].getTextureRect());
+            if(++m_animationCounter >= m_animationDOWN.size())
+            {
+                m_animationCounter = 0;
+            }
+            break;
+        default:
+            break;
+    }
+}

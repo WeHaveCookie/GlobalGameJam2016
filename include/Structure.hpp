@@ -25,4 +25,5 @@ struct CircleMenu
     SelectedLevel level;
 };
 
+
 #endif // STRUCTURE_H

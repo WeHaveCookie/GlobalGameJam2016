@@ -1,10 +1,12 @@
 #ifndef CONTROLLER_HPP
 #define CONTROLLER_HPP
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <time.h>
+
 
 #include "Character.hpp"
 #include "Quadtree.hpp"
@@ -35,6 +37,10 @@ class Controller
         sf::View m_view;
         Level* m_level;
         Engine* m_engine;
+
+        //Sound
+        sf::Music* m_mainThemeMusic;
+
 };
 
 #endif // CONTROLLER_HPP

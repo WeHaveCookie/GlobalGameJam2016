@@ -1,12 +1,30 @@
 #include "Map.hpp"
 
-Map::Map(const std::string& path)
+Map::Map(const std::string& path, std::string pattern)
 :m_path(path), Reader(path)
 {
     //ctor
     m_mapSize.x = PATTERN_WIDTH;
     m_mapSize.y = PATTERN_HEIGHT;
     m_spriteSize = sf::Vector2u(SPRITE_WIDTH,SPRITE_HEIGHT);
+
+    sf::Texture* txt = new sf::Texture();
+    if(!txt->loadFromFile(patternPath + pattern + ".png"))
+    {
+
+    }
+    m_ground.setTexture(*txt);
+    //m_wall.setTextureRect(sf::IntRect(0,0,1920,1080));
+
+    /*sf::Texture txt1;
+    if(!txt1.loadFromFile(patternPath+pattern+"Ground.png"))
+    {
+        // UNABLE TO OPEN TEXTURE
+    }
+
+    m_ground.setTexture(txt1);*/
+    //m_ground.setTextureRect(sf::IntRect(0,0,1920,1080));
+
     read();
 }
 
@@ -14,6 +32,7 @@ Map::~Map()
 {
     //dtor
 }
+
 
 void Map::read()
 {
@@ -36,21 +55,24 @@ void Map::read()
                 case '0':
                     tileNumber = 0;
                     type = TileType::PASSING;
+                    //std::cout << "Read 0" << std::endl;
                     break;
                 case '1':
                     tileNumber = 1;
                     type = TileType::BLOCKING;
+                    //std::cout << "Read 1" << std::endl;
                     break;
                 default:
                     tileNumber = 0;
                     type = TileType::PASSING;
+                    std::cout << "Read ERROR " << std::endl;
                     break;
             }
             int tu = tileNumber % (m_tileset.getSize().x / m_spriteSize.x);
             int tv = tileNumber / (m_tileset.getSize().x / m_spriteSize.x);
 
             sf::Vertex* quad = &m_vertices[(j + i * m_mapSize.x) * 4];
-            //std::cout << "Position of quad : " << j << ":" << i << " x=" << j * m_spriteSize.x << " y=" << i * m_spriteSize.y << " de type : " << m_curChar <<std::endl;
+
             quad[0].position = sf::Vector2f(j * m_spriteSize.x, i * m_spriteSize.y);
             quad[1].position = sf::Vector2f((j + 1) * m_spriteSize.x, i * m_spriteSize.y);
             quad[2].position = sf::Vector2f((j + 1) * m_spriteSize.x, (i + 1) * m_spriteSize.y);
@@ -61,19 +83,15 @@ void Map::read()
             quad[2].texCoords = sf::Vector2f((tu + 1) * m_spriteSize.x, (tv + 1) * m_spriteSize.y);
             quad[3].texCoords = sf::Vector2f(tu * m_spriteSize.x, (tv + 1) * m_spriteSize.y);
 
-            /*std::cout << "Vertice " << j*4 << std::endl;
-            std::cout << "Pos [0] : x=" << quad[0].position.x << " y=" << quad[0].position.y << std::endl;
-            std::cout << "Pos [1] : x=" << quad[1].position.x << " y=" << quad[1].position.y << std::endl;
-            std::cout << "Pos [2] : x=" << quad[2].position.x << " y=" << quad[2].position.y << std::endl;
-            std::cout << "Pos [3] : x=" << quad[3].position.x << " y=" << quad[3].position.y << std::endl;
-            std::string str;
-            std::getline(std::cin,str);*/
+
 
             sf::Sprite sprite;
             sprite.setTexture(m_tileset);
             sprite.setTextureRect(sf::IntRect(tu * m_spriteSize.x, tv * m_spriteSize.y,m_spriteSize.x,m_spriteSize.y));
             sprite.setPosition(j * m_spriteSize.x, i * m_spriteSize.y);
-            m_cases.push_back(Case(sprite,type));
+            Case ca = Case(sprite,type);
+            m_cases.push_back(ca);
+
             nextChar();
             skipSeparator();
 

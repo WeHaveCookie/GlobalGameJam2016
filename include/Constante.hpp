@@ -23,4 +23,7 @@ std::string const defaultMenuPath = "Ressources/Menu/";
 std::string const tilesetPath = "Ressources/Tileset/tileset.png";
 std::string const mapPath = "Ressources/Map/";
 std::string const levelPath = "Ressources/Level/";
+std::string const soundPath = "Ressources/Sound/Musique/";
+std::string const patternPath = "Ressources/Pattern/Pattern";
+std::string const objectPath = "Ressources/Object/";
 #endif // CONSTANTES_HPP
