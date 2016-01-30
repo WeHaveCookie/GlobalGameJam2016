@@ -1,14 +1,18 @@
 #include "../include/Controller.hpp"
 
-Controller::Controller(sf::RenderWindow* window, Character* character, Quadtree* world, FireWall* wall)
+Controller::Controller(sf::RenderWindow* window, Character* character, FireWall* wall, Engine* engine)
 {
     m_window = window;
     m_player = character;
-    m_world = world;
     m_fireWall = wall;
     m_menu = new Menu();
     m_displayMenu = false;
     m_view = m_window->getDefaultView();
+    m_engine = engine;
+    // LOAD MAP FOR TESTING
+    m_level = new Level(levelPath+"level.lvl");
+    m_engine->setMap(m_level);
+
     //ctor
 }
 
@@ -56,6 +60,22 @@ int Controller::start()
                             case sf::Keyboard::A :
                                 m_displayMenu = true;
                                 break;
+                            /*case sf::Keyboard::Right :
+                                std::cout << "Catch Right" << std::endl;
+                                m_engine->move(m_player,sf::Vector2f(1.0,0.0));
+                                break;
+                            case sf::Keyboard::Left :
+                                std::cout << "Catch Left" << std::endl;
+                                m_engine->move(m_player,sf::Vector2f(-1.0,0.0));
+                                break;
+                            case sf::Keyboard::Up :
+                                std::cout << "Catch Up" << std::endl;
+                                m_engine->move(m_player,sf::Vector2f(0.0,-1.0));
+                                break;
+                            case sf::Keyboard::Down :
+                                std::cout << "Catch Down" << std::endl;
+                                m_engine->move(m_player,sf::Vector2f(0.0,1.0));
+                                break;*/
                             default :
                                 break;
                         }
@@ -78,9 +98,9 @@ int Controller::start()
                                     SelectedLevel level = m_menu->selectLevel(rect);
                                     if(level != SelectedLevel::NONE)
                                     {
-                                        m_level = level;
+                                        m_selectedLevel = level;
                                         m_displayMenu = false;
-                                        std::cout << "load level : " << m_level << std::endl;
+                                        std::cout << "load level : " << m_selectedLevel << std::endl;
                                     }
                                 }
                             break;
@@ -104,15 +124,37 @@ int Controller::start()
             }
         }
 
-        /** AJOUT DE CODE**/
 
+        /** AJOUT DE CODE**/
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            //std::cout << "Catch Right" << std::endl;
+            m_engine->move(m_player,sf::Vector2f(1.0,0.0));
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            m_engine->move(m_player,sf::Vector2f(-1.0,0.0));
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {
+            m_engine->move(m_player,sf::Vector2f(0.0,-1.0));
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+            m_engine->move(m_player,sf::Vector2f(0.0,1.0));
+        }
 
         if (sf::Joystick::isButtonPressed(0, 0)){//"A" button on the XBox 360 controller
-            turbo = 2;
+            //turbo = 2;
+            m_player->setSpeed(4.0f);
         }
 
         if (!sf::Joystick::isButtonPressed(0, 0)){
-            turbo = 1;
+            m_player->setSpeed(2.0f);
+            //turbo = 1;
         }
 
         if(sf::Joystick::isButtonPressed(0,1)){//"B" button on the XBox 360 controller
@@ -141,7 +183,8 @@ int Controller::start()
                 //A 15% DEAD ZONE SEEMS TO WORK FOR ME - GIVE THAT A SHOT
                 if (speed.x > 15.f || speed.x < -15.f || speed.y > 15.f || speed.y < -15.f)
                 {
-                    m_player->move(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(), turbo*speed.y*TimePerFrame.asSeconds()),m_world);
+                    //m_player->move(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(), turbo*speed.y*TimePerFrame.asSeconds()));
+                    m_engine->move(m_player,sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(), turbo*speed.y*TimePerFrame.asSeconds()));
                 }
             }
 
@@ -152,22 +195,21 @@ int Controller::start()
             float decPlayer = m_player->getSprite().getGlobalBounds().left - m_view.getCenter().x;
             if((m_view.getSize().x/2) + decPlayer > (m_view.getSize().x*0.66))
             {
-                m_view.move(sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0)));
-                m_fireWall->move(sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
+                // m_view.move(sf::Vector2f(SPRITE_WIDTH,0));
+                //m_engine->move(m_fireWall,sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
             }
-            m_view.move(1,0);
+            //m_view.move(1,0);
             m_window->setView(m_view);
+            m_level->drawMap(m_window);
             m_player->draw(m_window);
-            m_world->draw(m_window);
-            m_fireWall->draw(m_window);
+            //m_fireWall->draw(m_window);
 
         }
         m_window->display();
     }
 }
 
-void Controller::update()
+void Controller::setLevel(std::string path)
 {
-
+    m_level = new Level(path);
 }
-

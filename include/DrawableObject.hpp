@@ -10,10 +10,14 @@ class DrawableObject
     public:
         DrawableObject();
         virtual ~DrawableObject();
+        virtual void move(sf::Vector2f motion);
+        inline int getPositionInWorld() {return m_positionInWorld;}
     protected:
-        virtual void draw(sf::RenderWindow* window) = 0;
-        virtual void update(sf::RenderWindow* window) = 0;
+        virtual void draw(sf::RenderWindow* window);
+        virtual void update(sf::RenderWindow* window);
+        int m_positionInWorld;
     private:
+        //int m_positionInWorld;
 };
 
 #endif // DRAWABLEOBJECT_HPP

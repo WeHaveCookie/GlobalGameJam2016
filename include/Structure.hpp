@@ -15,6 +15,10 @@ struct SplitedSprite
 
 enum SelectedLevel {WATER, FIRE, EARTH, WIND, NONE};
 
+enum TileType {BLOCKING, PASSING};
+
+enum MovingState {RIGHT, LEFT, DOWN, UP, IDLE};
+
 struct CircleMenu
 {
     sf::CircleShape circle;

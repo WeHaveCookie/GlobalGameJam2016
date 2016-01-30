@@ -84,12 +84,12 @@ void Menu::draw(sf::RenderWindow* window)
 
 SelectedLevel Menu::selectLevel(const sf::FloatRect& query)
 {
-    for(std::vector<CircleMenu>::iterator it = m_shapes.begin(); it != m_shapes.end(); it++)
+    /*for(std::vector<CircleMenu>::iterator it = m_shapes.begin(); it != m_shapes.end(); it++)
     {
         if(Engine::collisionCircle(query,(*it).circle))
         {
             return (*it).level;
         }
-    }
+    }*/
     return SelectedLevel::NONE;
 }

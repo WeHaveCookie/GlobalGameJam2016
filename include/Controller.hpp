@@ -11,16 +11,16 @@
 #include "FireWall.hpp"
 #include "Menu.hpp"
 #include "Structure.hpp"
-
-class Menu;
+#include "Level.hpp"
 
 class Controller
 {
     public:
-        Controller(sf::RenderWindow* window, Character* character, Quadtree* world, FireWall* wall);
+        Controller(sf::RenderWindow* window, Character* character, FireWall* wall, Engine* engine);
         int start();
+        void setLevel(std::string path);
         inline sf::RenderWindow* getWindow() {return m_window;}
-        inline void setLevel(SelectedLevel level) {m_level = level;}
+        inline void setLevel(SelectedLevel level) {m_selectedLevel = level;}
         inline void displayMenu(bool b) {m_displayMenu = b;}
         virtual ~Controller();
     protected:
@@ -28,12 +28,13 @@ class Controller
         void update();
         sf::RenderWindow* m_window;
         Character* m_player;
-        Quadtree* m_world;
         FireWall* m_fireWall;
         Menu* m_menu;
-        SelectedLevel m_level;
+        SelectedLevel m_selectedLevel;
         bool m_displayMenu;
         sf::View m_view;
+        Level* m_level;
+        Engine* m_engine;
 };
 
 #endif // CONTROLLER_HPP

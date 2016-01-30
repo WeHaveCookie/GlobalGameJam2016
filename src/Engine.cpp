@@ -1,8 +1,14 @@
 #include "../include/Engine.hpp"
 
+Engine::Engine(Level* level)
+{
+    m_level = level;
+    //ctor
+}
+
 Engine::Engine()
 {
-    //ctor
+
 }
 
 Engine::~Engine()
@@ -44,7 +50,7 @@ bool Engine::collisionAABB(sf::FloatRect box1, sf::FloatRect box2)
 * \param box1 : The Sprite to test, motion : Motion Vector, universe : Quadtree which represents world
 * \return True if the movement of box1 by motion is correct. False otherwise
 **/
-bool Engine::move(sf::Sprite box1, const sf::Vector2f& motion, Quadtree* universe)
+bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion)
 {
     if(DEBUG)
     {
@@ -52,46 +58,72 @@ bool Engine::move(sf::Sprite box1, const sf::Vector2f& motion, Quadtree* univers
         std::cout << "*  ENGINE : MOVE  *" << std::endl;
         std::cout << "*-----------------*" << std::endl;
     }
-    sf::Vector2f initPos = box1.getPosition();
-    box1.setPosition(initPos+motion);
-
-    if(box1.getGlobalBounds().left < 0 ||
-        box1.getGlobalBounds().top < 0 ||
-        box1.getGlobalBounds().left + box1.getGlobalBounds().width > universe->getShape().width ||
-        box1.getGlobalBounds().top + box1.getGlobalBounds().height > universe->getShape().height)
+    //std::cout << "Motion x : " << motion.x << " Motion y : " << motion.y << std::endl;
+    sf::Vector2f realMotion;
+    if(abs(motion.x) > abs(motion.y))
     {
+        if(motion.x > 0)
+        {
+            realMotion.x = 1.0f;
+        } else if (motion.x < 0)
+        {
+            realMotion.x = -1.0f;
+        } else
+        {
+            realMotion.x = 0.0f;
+        }
+    } else
+    {
+        if(motion.y > 0)
+        {
+            realMotion.y = 1.0f;
+        } else if (motion.y < 0)
+        {
+            realMotion.y = -1.0f;
+        } else
+        {
+            realMotion.y = 0.0f;
+        }
+    }
+
+    /*if(motion.x > 1)
+    {
+        realMotion.x = 1.0f;
+    } else if (motion.x < -1)
+    {
+        realMotion.x = -1.0f;
+    } else
+    {
+        realMotion.x = 0.0f;
+    }
+    if(motion.y > 1)
+    {
+        realMotion.y = 1.0f;
+    } else if (motion.y < -1)
+    {
+        realMotion.y = -1.0f;
+    } else
+    {
+        realMotion.y = 0.0f;
+    }*/
+
+    int initPos = obj->getPositionInWorld();
+    /*std::cout << "Pos init : " << initPos << std::endl;
+    std::cout << "RealMotion.x : " << realMotion.x << std::endl;
+    std::cout << "RealMotion.y : " << realMotion.y << std::endl;
+    std::cout << "Realy+PATTERN : " << realMotion.y*PATTERN_WIDTH << std::endl;*/
+    int newPosition = initPos + realMotion.x + realMotion.y*PATTERN_WIDTH;
+    if(m_level->getCurrentMap()->getCases().at(newPosition).getType() == TileType::BLOCKING)
+    { // On block !
+        //std::cout << "Block" << std::endl;
         return false;
+    } else
+    {
+        //std::cout << "Try Move with : x=" << realMotion.x << " y=" << realMotion.y << std::endl;
+        obj->move(realMotion);
+        return true;
     }
 
-    std::vector<std::shared_ptr<sf::Sprite>> listObject = universe->queryRange(box1.getGlobalBounds());
-    if(listObject.size() > 0)
-    {
-        if(DEBUG)
-        {
-            std::cout << "Il y a " << listObject.size() << " en possible collision" << std::endl;
-        }
-        for(std::vector<std::shared_ptr<sf::Sprite>>::iterator it = listObject.begin(); it != listObject.end(); it++)
-        {
-           if(collisionAABB((*it)->getGlobalBounds(),box1.getGlobalBounds()))
-           {
-               if(DEBUG)
-               {
-                   std::cout << "*-----------*" << std::endl;
-                   std::cout << "  COLLISION  " << std::endl;
-                   std::cout << "*-----------*" << std::endl;
-                   std::cout << "Char : [x=" << box1.getGlobalBounds().left << ";y=" << box1.getGlobalBounds().top << ";width=" << box1.getGlobalBounds().width << ";height=" << box1.getGlobalBounds().height <<  "]" << std::endl;
-                   std::cout << "Tile : [x=" << (*it)->getGlobalBounds().left << ";y=" << (*it)->getGlobalBounds().top << ";width=" << (*it)->getGlobalBounds().width << ";height=" << (*it)->getGlobalBounds().height << "]" << std::endl;
-               }
-               box1.setPosition(initPos);
-               return false;
-           }
-        }
-    }
-    if(DEBUG)
-    {
-        std::cout << "Pas de collision " << std::endl;
-    }
-    return true;
 }
 
 /**

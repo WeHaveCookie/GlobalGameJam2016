@@ -21,11 +21,14 @@ Character::Character(std::string path)
     m_sprite.setTextureRect(sf::IntRect(0,0,64,64));
     //m_sprite.setScale(0.5,0.5);
     // Position initial du joueur
-    m_position.x = 100;
-    m_position.y = 100;
-    m_speed = 1.0f;
+    m_positionInWorld = 90;
+    m_position = sf::Vector2f((m_positionInWorld%PATTERN_WIDTH)*SPRITE_WIDTH,(m_positionInWorld/PATTERN_WIDTH)*SPRITE_HEIGHT);
+    m_sprite.setPosition(m_position);
+    m_speed = 2.0f;
 
     m_alive = true;
+    m_onMove = false;
+    m_movingState = MovingState::IDLE;
 }
 
 /**
@@ -71,7 +74,10 @@ void Character::update(sf::RenderWindow* window)
 {
     if(m_alive)
     {
-        m_sprite.setPosition(m_position);
+        if(m_onMove){
+            updatePosition();
+            m_sprite.setPosition(m_position);
+        }
     } else
     {
         //std::cout << "Player Dead" << std::endl;
@@ -87,30 +93,86 @@ void Character::update(sf::RenderWindow* window)
 * \param motion : Motion Vector, universe : Quadtree which represents world
 * \return void
 **/
-void Character::move(sf::Vector2f motion, Quadtree* universe)
+void Character::move(sf::Vector2f motion)
 {
-    if(motion.x == 0 && motion.y == 0)
+    if(!m_onMove)
     {
-        return;
+        m_onMove = true;
+        m_motion = motion*(float)SPRITE_HEIGHT;
     }
-    sf::Vector2f realMotion = motion * m_speed;
-    if (Engine::move(m_sprite,realMotion,universe))
-    { // Pas de collision
-        m_position += realMotion;
-    }
+
+    //m_positionInWorld += motion.x + motion.y*PATTERN_WIDTH;
 }
 
 
-/**
-* \fn jump(sf::Vector2f motion, Quadtree* universe)
-*
-* \brief Jump character if possible and correct
-*
-* \param motion : Motion Vector, universe : Quadtree which represents world
-* \return void
-**/
-/*void Character::jump(sf::Vector2f motion, Quadtree* universe)
+void Character::updatePosition()
 {
+    if(m_motion.x > 0)
+    { // On vas à droite
+        m_position.x += 2*m_speed;
+        m_motion.x -= 2*m_speed;
+        m_movingState = MovingState::RIGHT;
+        if(m_motion.x < 0)
+        {
+            m_position.x += m_motion.x;
+            m_motion.x = 0;
+        }
+    } else if (m_motion.x < 0)
+    { // On vas à gauche
+        m_position.x -= 2*m_speed;
+        m_motion.x += 2*m_speed;
+        m_movingState = MovingState::LEFT;
+        if(m_motion.x > 0)
+        {
+            m_position.x -= m_motion.x;
+            m_motion.x = 0;
+        }
+    } else if(m_motion.y > 0)
+    { // on vas en bas
+        m_position.y += 2*m_speed;
+        m_motion.y -= 2*m_speed;
+        m_movingState = MovingState::DOWN;
+        if(m_motion.y < 0)
+        {
+            m_position.y += m_motion.y;
+            m_motion.y = 0;
+        }
+    } else if (m_motion.y < 0)
+    { // on vas en haut
+        m_position.y -= 2*m_speed;
+        m_motion.y += 2*m_speed;
+        m_movingState = MovingState::UP;
+        if(m_motion.y > 0)
+        {
+            m_position.y -= m_motion.y;
+            m_motion.y = 0;
+        }
+    } else
+    { // Fin du mouvement
+        //std::cout << "Motion x=" << m_motion.x << " y=" << m_motion.y << std::endl;
+        switch(m_movingState)
+        {
+            case RIGHT :
+                m_positionInWorld += 1;
+                break;
+            case LEFT :
+                m_positionInWorld -= 1;
+                break;
+            case DOWN :
+                m_positionInWorld += PATTERN_WIDTH;
+                break;
+            case UP :
+                m_positionInWorld -= PATTERN_WIDTH;
+                break;
+            case IDLE :
+                // Intentionnal Fallthrought
+            default:
+                break;
+        }
+        m_movingState = MovingState::IDLE;
+        m_onMove = false;
+        m_position = sf::Vector2f((m_positionInWorld%PATTERN_WIDTH)*SPRITE_WIDTH,(m_positionInWorld/PATTERN_WIDTH)*SPRITE_HEIGHT);
+    }
 
-}*/
+}
 

@@ -32,10 +32,10 @@ void FireWall::draw(sf::RenderWindow* window)
 void FireWall::update(sf::RenderWindow* window)
 {
     move(sf::Vector2f(1,0));
-    if (Engine::collisionAABB(m_player->getSprite().getGlobalBounds(),m_sprite.getGlobalBounds()))
+    /*if (Engine::collisionAABB(m_player->getSprite().getGlobalBounds(),m_sprite.getGlobalBounds()))
     { // Collision avec le joueur
         m_player->setAlive(false);
-    }
+    }*/
     m_sprite.setPosition(m_position);
 }
 
