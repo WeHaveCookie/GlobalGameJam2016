@@ -20,6 +20,7 @@ class Map : public Reader, public sf::Drawable, public sf::Transformable
             states.texture = &m_tileset;
             target.draw(m_vertices, states);
         }
+        inline sf::VertexArray getVertices() {return m_vertices;}
 
     protected:
     private:

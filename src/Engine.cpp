@@ -59,6 +59,7 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion)
         std::cout << "*-----------------*" << std::endl;
     }
     //std::cout << "Motion x : " << motion.x << " Motion y : " << motion.y << std::endl;
+    //std::cout << "Try to move" << std::endl;
     sf::Vector2f realMotion;
     if(abs(motion.x) > abs(motion.y))
     {
@@ -112,8 +113,9 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion)
     std::cout << "RealMotion.x : " << realMotion.x << std::endl;
     std::cout << "RealMotion.y : " << realMotion.y << std::endl;
     std::cout << "Realy+PATTERN : " << realMotion.y*PATTERN_WIDTH << std::endl;*/
-    int newPosition = initPos + realMotion.x + realMotion.y*PATTERN_WIDTH;
-    if(m_level->getCurrentMap()->getCases().at(newPosition).getType() == TileType::BLOCKING)
+    int newPosition = initPos + realMotion.x + realMotion.y*(PATTERN_WIDTH*PATTERN_NBR);
+    //std::cout << "Type : " << m_level->getTypeOfLevelCasesAt(newPosition) << std::endl;
+    if(m_level->getTypeOfLevelCasesAt(newPosition) == TileType::BLOCKING)
     { // On block !
         //std::cout << "Block" << std::endl;
         return false;

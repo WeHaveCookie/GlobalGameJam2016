@@ -20,7 +20,7 @@ void Reader::open(const std::string & filePath)
     }
 
     // FOR JAM
-    std::cout << "Skip : " << m_curChar << std::endl;
+    //std::cout << "Skip : " << m_curChar << std::endl;
     nextChar();
 }
 

@@ -198,7 +198,7 @@ int Controller::start()
                 // m_view.move(sf::Vector2f(SPRITE_WIDTH,0));
                 //m_engine->move(m_fireWall,sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
             }
-            //m_view.move(1,0);
+            m_view.move(1,0);
             m_window->setView(m_view);
             m_level->drawMap(m_window);
             m_player->draw(m_window);

@@ -21,8 +21,8 @@ Character::Character(std::string path)
     m_sprite.setTextureRect(sf::IntRect(0,0,64,64));
     //m_sprite.setScale(0.5,0.5);
     // Position initial du joueur
-    m_positionInWorld = 90;
-    m_position = sf::Vector2f((m_positionInWorld%PATTERN_WIDTH)*SPRITE_WIDTH,(m_positionInWorld/PATTERN_WIDTH)*SPRITE_HEIGHT);
+    m_positionInWorld = 4500;
+    m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
     m_sprite.setPosition(m_position);
     m_speed = 2.0f;
 
@@ -159,10 +159,10 @@ void Character::updatePosition()
                 m_positionInWorld -= 1;
                 break;
             case DOWN :
-                m_positionInWorld += PATTERN_WIDTH;
+                m_positionInWorld += PATTERN_WIDTH*PATTERN_NBR;
                 break;
             case UP :
-                m_positionInWorld -= PATTERN_WIDTH;
+                m_positionInWorld -= PATTERN_WIDTH*PATTERN_NBR;
                 break;
             case IDLE :
                 // Intentionnal Fallthrought
@@ -171,7 +171,7 @@ void Character::updatePosition()
         }
         m_movingState = MovingState::IDLE;
         m_onMove = false;
-        m_position = sf::Vector2f((m_positionInWorld%PATTERN_WIDTH)*SPRITE_WIDTH,(m_positionInWorld/PATTERN_WIDTH)*SPRITE_HEIGHT);
+        m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
     }
 
 }

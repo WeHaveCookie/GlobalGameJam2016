@@ -21,7 +21,7 @@ void Map::read()
     {
         //RAISE A LOAD TEXTURE EXCEPTION
     }
-    std::cout << "LOAD VERTICES" << std::endl;
+    //std::cout << "LOAD VERTICES" << std::endl;
     m_vertices.setPrimitiveType(sf::Quads);
     m_vertices.resize(PATTERN_HEIGHT*PATTERN_WIDTH*4);
     int tileNumber;
@@ -60,6 +60,14 @@ void Map::read()
             quad[1].texCoords = sf::Vector2f((tu + 1) * m_spriteSize.x, tv * m_spriteSize.y);
             quad[2].texCoords = sf::Vector2f((tu + 1) * m_spriteSize.x, (tv + 1) * m_spriteSize.y);
             quad[3].texCoords = sf::Vector2f(tu * m_spriteSize.x, (tv + 1) * m_spriteSize.y);
+
+            /*std::cout << "Vertice " << j*4 << std::endl;
+            std::cout << "Pos [0] : x=" << quad[0].position.x << " y=" << quad[0].position.y << std::endl;
+            std::cout << "Pos [1] : x=" << quad[1].position.x << " y=" << quad[1].position.y << std::endl;
+            std::cout << "Pos [2] : x=" << quad[2].position.x << " y=" << quad[2].position.y << std::endl;
+            std::cout << "Pos [3] : x=" << quad[3].position.x << " y=" << quad[3].position.y << std::endl;
+            std::string str;
+            std::getline(std::cin,str);*/
 
             sf::Sprite sprite;
             sprite.setTexture(m_tileset);

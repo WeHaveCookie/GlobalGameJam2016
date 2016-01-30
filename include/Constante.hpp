@@ -15,6 +15,7 @@
 // Constant for Tile
 #define PATTERN_HEIGHT 15
 #define PATTERN_WIDTH 30
+#define PATTERN_NBR 50
 
 std::string const defaultCharPath = "Ressources/Character/";
 std::string const defaultTilePath = "Ressources/Tileset/";
