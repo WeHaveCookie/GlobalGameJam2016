@@ -60,6 +60,11 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion, bool collisio
         std::cout << "*  ENGINE : MOVE  *" << std::endl;
         std::cout << "*-----------------*" << std::endl;
     }
+    if(!collision)
+    {
+        obj->move(motion);
+        return true;
+    }
     sf::Vector2f realMotion;
     if(abs(motion.x) > abs(motion.y))
     {
@@ -89,11 +94,6 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion, bool collisio
     int initPos = obj->getPositionInWorld();
     int newPosition = initPos + realMotion.x + realMotion.y*(PATTERN_WIDTH*PATTERN_NBR);
     //std::cout << "Type : " << m_level->getTypeOfLevelCasesAt(newPosition) << std::endl;
-    if(!collision)
-    {
-        obj->move(realMotion);
-        return true;
-    }
     if(m_level->getTypeOfLevelCasesAt(newPosition) == TileType::BLOCKING)
     { // On block !
         //std::cout << "Block" << std::endl;

@@ -12,8 +12,9 @@
 
 int main()
 {
-    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Proto Movement & Grabity", sf::Style::Default);
+    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Proto Movement & Grabity", sf::Style::Default | sf::Style::Fullscreen);
     window->setFramerateLimit(60);
+    window->setVerticalSyncEnabled(true);
     srand(time(NULL));
     //Creation d'un personnage
 

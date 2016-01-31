@@ -29,6 +29,7 @@ Character::Character(std::string path, Controller* controller)
 
     m_alive = true;
     m_onMove = false;
+    m_endAnimationDead = false;
     m_movingState = MovingState::IDLE;
     m_controller = controller;
     m_runeCounter = 0;
@@ -90,11 +91,14 @@ void Character::update(sf::RenderWindow* window)
         }
     } else
     {
-        if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
+        if(!m_endAnimationDead)
         {
-            updateAnimation();
-        } else {
-            m_timeSinceLastUpdate += m_TimePerFrame;
+            if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
+            {
+                updateAnimation();
+            } else {
+                m_timeSinceLastUpdate += m_TimePerFrame;
+            }
         }
         //std::cout << "Player Dead" << std::endl;
     }
@@ -188,7 +192,6 @@ void Character::updatePosition()
         m_movingState = MovingState::IDLE;
         m_onMove = false;
         m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
-        std::cout << "Try to get a rune at " << m_positionInWorld << std::endl;
         m_controller->getRune(m_positionInWorld);
 
     }
@@ -356,6 +359,7 @@ void Character::updateAnimation()
             m_sprite.setTextureRect(m_animationDEAD[m_animationCounter].getTextureRect());
             if(++m_animationCounter >= m_animationDOWN.size())
             {
+                m_endAnimationDead = true;
                 m_animationCounter = 0;
             }
         default:

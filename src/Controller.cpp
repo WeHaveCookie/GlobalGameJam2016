@@ -9,6 +9,10 @@ Controller::Controller(sf::RenderWindow* window)
     m_menu = new Menu();
     m_displayMenu = false;
     m_victory = false;
+    m_viewSpeed = DEFAULT_SPEED;
+    m_darksoulsSpeed = DEFAULT_SPEED;
+    m_speedPlayer = DEFAULT_SPEED;
+    m_pitch = 1;
     //m_view = m_window->getDefaultView();
     m_viewGame.reset(sf::FloatRect(0, 0, 1920, 960));
     m_viewHUD.reset(sf::FloatRect(0,960,1920,120));
@@ -33,12 +37,9 @@ Controller::Controller(sf::RenderWindow* window)
         std::cout << "Unable to load " << soundPath+"SoulMenu.ogg" <<std::endl;
         //RAISE ERROR
     }
-
-    sf::SoundBuffer buffer;
-    if(!buffer.loadFromFile(fxPath+"Soul_Runes_SFX_OS.wav"))
+    if(!m_pickupRuneSound.openFromFile(fxPath+"Soul_AmeFeedback_SFX_OS.ogg"))
     {
     }
-    m_pickupRuneSound.setBuffer(buffer);
 
 
     if(!m_runeTexture.loadFromFile(objectPath + "rune.png"))
@@ -93,7 +94,7 @@ int Controller::start()
     m_menuMusic.setVolume(100);
     m_menuMusic.setLoop(true);
     m_displayMenu = true;
-    m_pickupRuneSound.play();
+    m_pickupRuneSound.setVolume(100);
     //m_mainThemeMusic->play();
     while (m_window->isOpen())
     {
@@ -178,13 +179,15 @@ int Controller::start()
 
         if (sf::Joystick::isButtonPressed(0, 0)){//"A" button on the XBox 360 controller
             //turbo = 2;
-            m_player->setSpeed(4.0f);
+
+            m_player->setSpeed(m_speedPlayer*2.0f);
         }
 
         if(sf::Joystick::isButtonPressed(0,7))
         {
             if(m_displayMenu=true)
             {
+                m_pickupRuneSound.play();
                 m_transitionMusic = true;
             }
             m_displayMenu=false;
@@ -192,7 +195,7 @@ int Controller::start()
 
 
         if (!sf::Joystick::isButtonPressed(0, 0)){
-            m_player->setSpeed(2.0f);
+            m_player->setSpeed(m_speedPlayer);
             //turbo = 1;
         }
 
@@ -208,9 +211,7 @@ int Controller::start()
             m_level->drawMap(m_window,m_viewGame);
             m_player->draw(m_window);
             m_window->draw(m_filterMenu);
-            //m_fireWall->draw(m_window);
             m_window->setView(m_viewHUD);
-            //m_menu->draw(m_window);
             displayRune();
 
         } else if (!m_player->isAlive())
@@ -218,12 +219,11 @@ int Controller::start()
             m_window->setView(m_viewGame);
             m_level->drawMap(m_window,m_viewGame);
             m_player->draw(m_window);
-            m_window->draw(m_filterMenu);
-            //m_fireWall->draw(m_window);
+            //m_window->draw(m_filterMenu);
+            displayDarkSouls();
             m_window->setView(m_viewHUD);
-            //m_menu->draw(m_window);
             displayRune();
-            sf::Clock tickClock;
+            /*sf::Clock tickClock;
             sf::Time m_timeSinceLastUpdate = sf::Time::Zero;
             sf::Time m_TimePerFrame = sf::seconds(1.f / 60.f);
             sf::Time m_duration = sf::seconds(0.1);
@@ -232,11 +232,11 @@ int Controller::start()
             {
                 if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
                 {
-                    updateAnimationd();
+                    updateAnimationDeath();
                 } else {
                     m_timeSinceLastUpdate += m_TimePerFrame;
                 }
-            }
+            }*/
         } else
         {
 
@@ -257,7 +257,6 @@ int Controller::start()
                     if (speed.x > 60.f || speed.x < -60.f || speed.y > 60.f || speed.y < -60.f)
                     {
                         m_engine->move(m_player,sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(), turbo*speed.y*TimePerFrame.asSeconds()));
-
                     }
                 }
 
@@ -269,26 +268,47 @@ int Controller::start()
                 if((m_viewGame.getSize().x/2) + decPlayer > (m_viewGame.getSize().x*0.66))
                 {
                     m_viewGame.move(sf::Vector2f(m_player->getSpeed()*2.0,0));
-                    moveSouls(sf::Vector2f(m_player->getSpeed()*2.0,0));
+                    moveSouls(sf::Vector2f(m_player->getSpeed()*2.0,0.0));
                     //m_engine->move(m_darksoul,sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
                 }
+                m_viewGame.move(m_viewSpeed,0);
+                moveSouls(sf::Vector2f(m_darksoulsSpeed,0.0));
             }
 
-            m_viewGame.move(1,0);
-            moveSouls(sf::Vector2f(1.0,0.0));
+
             m_window->setView(m_viewGame);
             m_level->drawMap(m_window,m_viewGame);
             m_player->draw(m_window);
             displayDarkSouls();
-            //m_darksouls->draw(m_window);
 
             m_window->setView(m_viewHUD);
             displayRune();
+            growSpeed();
         }
         m_window->display();
     }
     m_mainThemeMusic.stop();
     return 0;
+}
+
+void Controller::growSpeed()
+{
+    float motion;
+    float pitch;
+    motion = 0.05;
+    pitch = 0.001;
+    int rb = rand()%(500-0) +0;
+
+    if(rb < 10)
+    {
+
+        m_pitch += pitch;
+        m_viewSpeed+=motion;
+        m_darksoulsSpeed+=motion;
+        m_speedPlayer+=motion;
+        m_player->setSpeed(m_speedPlayer);
+        std::cout << "Grow speed " << motion << " and pitch " << m_pitch << std::endl;
+    }
 }
 
 void Controller::setLevel(std::string path)
@@ -364,6 +384,8 @@ void Controller::updateMusic()
             {
                 m_mainThemeMusic.play();
             }
+            //std::cout << "Pitch : " << m_pitch << std::endl;
+            m_mainThemeMusic.setPitch(m_pitch);
         }
     }
 

@@ -25,6 +25,7 @@ public:
     inline void setAlive(bool b) {m_alive = b; m_movingState = MovingState::DEAD; m_animationCounter = 0;}
     inline void setSpeed(float f) {m_speed = f;}
     inline float getSpeed() {return m_speed;}
+    inline bool isAlive() {return m_alive;}
     virtual ~Character();
 protected:
 private:
@@ -38,6 +39,7 @@ private:
     float m_speed;
     bool m_alive;
     bool m_onMove;
+    bool m_endAnimationDead;
     MovingState m_movingState;
     std::vector<sf::Sprite> m_animationLEFT;
     std::vector<sf::Sprite> m_animationRIGHT;
@@ -53,6 +55,7 @@ private:
 
 	Controller* m_controller;
 	int m_runeCounter;
+
 };
 
 #endif // CHARACTER_HPP

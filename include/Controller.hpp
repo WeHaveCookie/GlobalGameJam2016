@@ -27,6 +27,7 @@ class Controller
         void setLevel(std::string path);
         void getRune(int pos);
         void displayRune();
+        void growSpeed();
         void displayDarkSouls();
         void moveSouls(sf::Vector2f motion);
         inline sf::RenderWindow* getWindow() {return m_window;}
@@ -60,7 +61,12 @@ class Controller
         sf::Texture m_runeTexture;
         bool m_transitionMusic;
         int m_counterTransitionMusic;
-        sf::Sound m_pickupRuneSound;
+        sf::Music m_pickupRuneSound;
+
+        float m_viewSpeed;
+        float m_darksoulsSpeed;
+        float m_speedPlayer;
+        float m_pitch;
 };
 
 #endif // CONTROLLER_HPP

@@ -169,10 +169,6 @@ void Level::generateRune()
 
         }
     }
-    Rune* r = new Rune("Rune.png",2108);
-    m_rune.push_back(r);
-    r = new Rune("Rune.png",2109);
-    m_rune.push_back(r);
     std::cout << "Gene done " << std::endl;
 }
 
