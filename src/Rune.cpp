@@ -91,7 +91,7 @@ void Rune::updateAnimation()
 void Rune::build()
 {
     sf::Sprite sprite;
-    m_texture.setSmooth(true);
+    m_texture.setSmooth(false);
     sprite.setTexture(m_texture);
 
     // Set animation IDLEGAME

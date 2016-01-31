@@ -6,7 +6,7 @@
 #include <SFML/Audio.hpp>
 
 #include "include/Character.hpp"
-#include "include/FireWall.hpp"
+#include "include/DarkSoul.hpp"
 #include "include/Controller.hpp"
 #include "include/Engine.hpp"
 

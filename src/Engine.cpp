@@ -52,7 +52,7 @@ bool Engine::collisionAABB(sf::FloatRect box1, sf::FloatRect box2)
 * \param box1 : The Sprite to test, motion : Motion Vector, universe : Quadtree which represents world
 * \return True if the movement of box1 by motion is correct. False otherwise
 **/
-bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion)
+bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion, bool collision)
 {
     if(DEBUG)
     {
@@ -89,6 +89,11 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion)
     int initPos = obj->getPositionInWorld();
     int newPosition = initPos + realMotion.x + realMotion.y*(PATTERN_WIDTH*PATTERN_NBR);
     //std::cout << "Type : " << m_level->getTypeOfLevelCasesAt(newPosition) << std::endl;
+    if(!collision)
+    {
+        obj->move(realMotion);
+        return true;
+    }
     if(m_level->getTypeOfLevelCasesAt(newPosition) == TileType::BLOCKING)
     { // On block !
         //std::cout << "Block" << std::endl;

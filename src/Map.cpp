@@ -7,7 +7,7 @@ Map::Map(const std::string& path, std::string pattern)
     m_mapSize.x = PATTERN_WIDTH;
     m_mapSize.y = PATTERN_HEIGHT;
     m_spriteSize = sf::Vector2u(SPRITE_WIDTH,SPRITE_HEIGHT);
-
+    //std::cout << "Load map " << path << " " << pattern << std::endl;
     sf::Texture* txt = new sf::Texture();
     if(!txt->loadFromFile(patternPath + pattern + ".png"))
     {

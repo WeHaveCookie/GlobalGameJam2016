@@ -74,6 +74,7 @@ void Level::buildLevel()
     m_levelVertices.resize(PATTERN_HEIGHT*PATTERN_WIDTH*PATTERN_NBR*4);
     for(int i=0;i<PATTERN_NBR;i++)
     {
+        //std::cout << "Get pattern " << tabPattern[i] << std::endl;
         sf::VertexArray patternVertice = m_maps[tabPattern[i]]->getVertices();
         std::vector<Case*> patternCase = m_maps[tabPattern[i]]->getCases();
         sf::Sprite ground = m_maps[tabPattern[i]]->getGround();
@@ -112,8 +113,8 @@ void Level::buildLevel()
 void Level::generatePattern(int* tab, const int& nbrPattern, const int& nbrGen)
 {
     // For lvl 1
-    //tab[0] = 5;
-    for(int i = 0; i < nbrGen; i++)
+    tab[0] = 4;
+    for(int i = 1; i < nbrGen; i++)
     {
         tab[i] = rand()%((nbrPattern-1)-0) + 0;
     }
@@ -157,13 +158,21 @@ void Level::generateRune()
         {
             std::cout << "Spawn rune at " << rb << " x=" << ca.getPosition().x << " y=" << ca.getPosition().y << std::endl;
             Rune* r = new Rune("Rune.png",rb);
+            if(r->getSprite().getPosition().x > 1920)
+            {
+                m_rune.push_back(r);
+                counterRune++;
+            }
             //r->setPosition(m_levelCases[rb]->getPosition());
             //m_levelCases[rb]->setRune(r);
             //std::cout << "Rune pos x:" << r->getSprite().getPosition().x << " y:" << r->getSprite().getPosition().y << std::endl;
-            m_rune.push_back(r);
-            counterRune++;
+
         }
     }
+    Rune* r = new Rune("Rune.png",2108);
+    m_rune.push_back(r);
+    r = new Rune("Rune.png",2109);
+    m_rune.push_back(r);
     std::cout << "Gene done " << std::endl;
 }
 

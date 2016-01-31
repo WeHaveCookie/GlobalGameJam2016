@@ -22,7 +22,7 @@ Character::Character(std::string path, Controller* controller)
     m_sprite.setTextureRect(sf::IntRect(0,0,64,64));
     //m_sprite.setScale(0.5,0.5);
     // Position initial du joueur
-    m_positionInWorld = 3*(PATTERN_WIDTH*PATTERN_NBR);
+    m_positionInWorld = 7*(PATTERN_WIDTH*PATTERN_NBR)+7;
     m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
     m_sprite.setPosition(m_position);
     m_speed = 2.0f;
@@ -90,6 +90,12 @@ void Character::update(sf::RenderWindow* window)
         }
     } else
     {
+        if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
+        {
+            updateAnimation();
+        } else {
+            m_timeSinceLastUpdate += m_TimePerFrame;
+        }
         //std::cout << "Player Dead" << std::endl;
     }
 
@@ -272,6 +278,31 @@ void Character::build()
     m_animationDOWN.push_back(sprite);
     m_animationCounter = 0;
 
+    // set animation DEATH
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*1,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*2,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*3,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*4,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*5,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*6,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*7,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*8,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*9,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+    sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*10,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
+    m_animationDEAD.push_back(sprite);
+
+
     sf::Clock tickClock;
 	m_timeSinceLastUpdate = sf::Time::Zero;
 	m_TimePerFrame = sf::seconds(1.f / 60.f);
@@ -321,6 +352,12 @@ void Character::updateAnimation()
                 m_animationCounter = 0;
             }
             break;
+        case MovingState::DEAD:
+            m_sprite.setTextureRect(m_animationDEAD[m_animationCounter].getTextureRect());
+            if(++m_animationCounter >= m_animationDOWN.size())
+            {
+                m_animationCounter = 0;
+            }
         default:
             break;
     }

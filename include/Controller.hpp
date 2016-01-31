@@ -9,7 +9,7 @@
 #include "Engine.hpp"
 
 #include "Character.hpp"
-#include "FireWall.hpp"
+#include "DarkSoul.hpp"
 #include "Menu.hpp"
 #include "Structure.hpp"
 #include "Level.hpp"
@@ -27,6 +27,8 @@ class Controller
         void setLevel(std::string path);
         void getRune(int pos);
         void displayRune();
+        void displayDarkSouls();
+        void moveSouls(sf::Vector2f motion);
         inline sf::RenderWindow* getWindow() {return m_window;}
         inline void setLevel(SelectedLevel level) {m_selectedLevel = level;}
         inline void displayMenu(bool b) {m_displayMenu = b;}
@@ -35,9 +37,10 @@ class Controller
     protected:
     private:
         void update();
+        void updateMusic();
         sf::RenderWindow* m_window;
         Character* m_player;
-        FireWall* m_fireWall;
+        std::vector<DarkSoul*> m_darksouls;
         Menu* m_menu;
         SelectedLevel m_selectedLevel;
         bool m_displayMenu;
@@ -47,14 +50,17 @@ class Controller
         Engine* m_engine;
 
         //Sound
-        sf::Music* m_mainThemeMusic;
+        sf::Music m_mainThemeMusic;
+        sf::Music m_menuMusic;
         std::vector<Rune*> m_runes;
         bool m_victory;
         sf::Sprite m_filterMenu;
         sf::Texture m_textureFilterMenu;
         std::vector<sf::Sprite> m_runeHUD;
         sf::Texture m_runeTexture;
-
+        bool m_transitionMusic;
+        int m_counterTransitionMusic;
+        sf::Sound m_pickupRuneSound;
 };
 
 #endif // CONTROLLER_HPP

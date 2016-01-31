@@ -15,7 +15,7 @@ class Engine
         virtual ~Engine();
         bool collisionCircle(sf::FloatRect box1, sf::CircleShape circle);
         bool collisionAABB(sf::FloatRect box1, sf::FloatRect box2);
-        bool move(DrawableObject* obj, const sf::Vector2f& motion);
+        bool move(DrawableObject* obj, const sf::Vector2f& motion, bool collision = true);
         /*bool jump(sf::FloatRect box1, sf::Vector2f motion, Quadtree* universe);*/
         inline void setMap(Level* level) {m_level = level;}
     protected:

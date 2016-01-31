@@ -17,7 +17,7 @@ enum SelectedLevel {WATER, FIRE, EARTH, WIND, NONE};
 
 enum TileType {BLOCKING, PASSING};
 
-enum MovingState {RIGHT, LEFT, DOWN, UP, IDLE};
+enum MovingState {RIGHT, LEFT, DOWN, UP, IDLE, DEAD};
 
 struct CircleMenu
 {

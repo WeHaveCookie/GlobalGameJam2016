@@ -22,7 +22,7 @@ public:
     void move(sf::Vector2f motion);
     void updateAnimation();
     inline sf::Sprite getSprite() {return m_sprite;}
-    inline void setAlive(bool b) {m_alive = b;}
+    inline void setAlive(bool b) {m_alive = b; m_movingState = MovingState::DEAD; m_animationCounter = 0;}
     inline void setSpeed(float f) {m_speed = f;}
     inline float getSpeed() {return m_speed;}
     virtual ~Character();
@@ -44,6 +44,7 @@ private:
     std::vector<sf::Sprite> m_animationUP;
     std::vector<sf::Sprite> m_animationDOWN;
     std::vector<sf::Sprite> m_animationIDLE;
+    std::vector<sf::Sprite> m_animationDEAD;
 
     int m_animationCounter;
     sf::Time m_timeSinceLastUpdate;

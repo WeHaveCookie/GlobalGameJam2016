@@ -17,14 +17,29 @@ Controller::Controller(sf::RenderWindow* window)
     // LOAD MAP FOR TESTING
     m_level = new Level(levelPath+"level.lvl");
     m_player = new Character("tileset.png",this);
-    m_fireWall = new FireWall("fire.jpg", window->getSize(), sf::Vector2f(0.0f, 0.0f));
+    for(int i(0);i<16;i++)
+    {
+        m_darksouls.push_back(new DarkSoul("darksoul.png", (i)*(PATTERN_WIDTH*PATTERN_NBR)));
+    }
     m_engine->setMap(m_level);
-    m_mainThemeMusic = new sf::Music();
-    if (!m_mainThemeMusic->openFromFile(soundPath+"MainTheme.ogg"))
+    m_transitionMusic = false;
+    if (!m_mainThemeMusic.openFromFile(soundPath+"MainTheme.ogg"))
     {
         std::cout << "Unable to load " << soundPath+"MainTheme.ogg" <<std::endl;
         //RAISE ERROR
     }
+    if (!m_menuMusic.openFromFile(soundPath+"SoulMenu.ogg"))
+    {
+        std::cout << "Unable to load " << soundPath+"SoulMenu.ogg" <<std::endl;
+        //RAISE ERROR
+    }
+
+    sf::SoundBuffer buffer;
+    if(!buffer.loadFromFile(fxPath+"Soul_Runes_SFX_OS.wav"))
+    {
+    }
+    m_pickupRuneSound.setBuffer(buffer);
+
 
     if(!m_runeTexture.loadFromFile(objectPath + "rune.png"))
     {
@@ -43,6 +58,7 @@ Controller::Controller(sf::RenderWindow* window)
     {
     }
     m_filterMenu.setTexture(m_textureFilterMenu);
+
     //ctor
 }
 
@@ -50,12 +66,10 @@ Controller::~Controller()
 {
     delete m_window;
     delete m_player;
-    delete m_fireWall;
     delete m_menu;
     delete m_level;
     delete m_engine;
-    m_mainThemeMusic->stop();
-    delete m_mainThemeMusic;
+    //m_mainThemeMusic->stop();
 
     //dtor        sf::RenderWindow* m_window;
 }
@@ -74,9 +88,12 @@ int Controller::start()
 	sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
 	sf::Time duration = sf::Time::Zero;
 
-    m_mainThemeMusic->setVolume(100);
-    m_mainThemeMusic->setLoop(true);
+    m_mainThemeMusic.setVolume(100);
+    m_mainThemeMusic.setLoop(true);
+    m_menuMusic.setVolume(100);
+    m_menuMusic.setLoop(true);
     m_displayMenu = true;
+    m_pickupRuneSound.play();
     //m_mainThemeMusic->play();
     while (m_window->isOpen())
     {
@@ -153,7 +170,7 @@ int Controller::start()
 
 
         /** AJOUT DE CODE**/
-
+        updateMusic();
         if(m_runes.size() >= 5)
         { // VICTORY STATEMENT
             m_victory = true;
@@ -166,6 +183,10 @@ int Controller::start()
 
         if(sf::Joystick::isButtonPressed(0,7))
         {
+            if(m_displayMenu=true)
+            {
+                m_transitionMusic = true;
+            }
             m_displayMenu=false;
         }
 
@@ -183,7 +204,6 @@ int Controller::start()
         m_window->clear();
         if(m_displayMenu)
         {
-
             m_window->setView(m_viewGame);
             m_level->drawMap(m_window,m_viewGame);
             m_player->draw(m_window);
@@ -193,6 +213,30 @@ int Controller::start()
             //m_menu->draw(m_window);
             displayRune();
 
+        } else if (!m_player->isAlive())
+        {
+            m_window->setView(m_viewGame);
+            m_level->drawMap(m_window,m_viewGame);
+            m_player->draw(m_window);
+            m_window->draw(m_filterMenu);
+            //m_fireWall->draw(m_window);
+            m_window->setView(m_viewHUD);
+            //m_menu->draw(m_window);
+            displayRune();
+            sf::Clock tickClock;
+            sf::Time m_timeSinceLastUpdate = sf::Time::Zero;
+            sf::Time m_TimePerFrame = sf::seconds(1.f / 60.f);
+            sf::Time m_duration = sf::seconds(0.1);
+            int animationDeath = 0 ;
+            while(animationDeath < 10)
+            {
+                if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
+                {
+                    updateAnimationd();
+                } else {
+                    m_timeSinceLastUpdate += m_TimePerFrame;
+                }
+            }
         } else
         {
 
@@ -225,30 +269,51 @@ int Controller::start()
                 if((m_viewGame.getSize().x/2) + decPlayer > (m_viewGame.getSize().x*0.66))
                 {
                     m_viewGame.move(sf::Vector2f(m_player->getSpeed()*2.0,0));
-                    //m_engine->move(m_fireWall,sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
+                    moveSouls(sf::Vector2f(m_player->getSpeed()*2.0,0));
+                    //m_engine->move(m_darksoul,sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
                 }
             }
 
-            //m_viewGame.move(1,0);
+            m_viewGame.move(1,0);
+            moveSouls(sf::Vector2f(1.0,0.0));
             m_window->setView(m_viewGame);
             m_level->drawMap(m_window,m_viewGame);
             m_player->draw(m_window);
-            //m_fireWall->draw(m_window);
+            displayDarkSouls();
+            //m_darksouls->draw(m_window);
 
             m_window->setView(m_viewHUD);
             displayRune();
-
         }
         m_window->display();
     }
-    m_mainThemeMusic->stop();
-    delete m_mainThemeMusic;
+    m_mainThemeMusic.stop();
     return 0;
 }
 
 void Controller::setLevel(std::string path)
 {
     m_level = new Level(path);
+}
+
+void Controller::moveSouls(sf::Vector2f motion)
+{
+    for(int i(0); i<m_darksouls.size();i++)
+    {
+        m_engine->move(m_darksouls[i],motion,false);
+        if (m_engine->collisionAABB(m_darksouls[i]->getSprite().getGlobalBounds(),m_player->getSprite().getGlobalBounds()))
+        {
+            m_player->setAlive(false);
+        }
+    }
+}
+
+void Controller::displayDarkSouls()
+{
+    for(int i(0); i<m_darksouls.size();i++)
+    {
+        m_darksouls[i]->draw(m_window);
+    }
 }
 
 void Controller::displayRune()
@@ -266,10 +331,49 @@ void Controller::displayRune()
     }
 }
 
+void Controller::updateMusic()
+{
+    if(m_transitionMusic)
+    {
+        //std::cout << "Set attenuation at " << m_counterTransitionMusic << std::endl;
+
+
+        m_menuMusic.setVolume(100-m_counterTransitionMusic);
+        m_mainThemeMusic.setVolume(m_counterTransitionMusic);
+        if(++m_counterTransitionMusic > 100)
+        {
+            m_counterTransitionMusic = 0;
+            m_transitionMusic = false;
+            m_menuMusic.stop();
+        }
+        if(m_mainThemeMusic.getStatus() != sf::SoundSource::Status::Playing)
+        {
+            m_mainThemeMusic.play();
+        }
+    } else
+    {
+        if(m_displayMenu)
+        {
+            if(m_menuMusic.getStatus() != sf::SoundSource::Status::Playing)
+            {
+                m_menuMusic.play();
+            }
+        } else
+        {
+            if(m_mainThemeMusic.getStatus() != sf::SoundSource::Status::Playing)
+            {
+                m_mainThemeMusic.play();
+            }
+        }
+    }
+
+}
+
 void Controller::getRune(int pos)
 {
     if(m_level->runeAt(pos))
         {
+            m_pickupRuneSound.play();
             Rune* rune = m_level->getRuneAt(pos);
             rune->taken(m_runes.size());
             m_runes.push_back(rune);

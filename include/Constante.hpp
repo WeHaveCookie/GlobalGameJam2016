@@ -24,6 +24,7 @@ std::string const tilesetPath = "Ressources/Tileset/tileset.png";
 std::string const mapPath = "Ressources/Map/";
 std::string const levelPath = "Ressources/Level/";
 std::string const soundPath = "Ressources/Sound/Musique/";
+std::string const fxPath = "Ressources/Sound/FX/";
 std::string const patternPath = "Ressources/Pattern/Pattern";
 std::string const objectPath = "Ressources/Object/";
 std::string const filterPath = "Ressources/Filter/";
