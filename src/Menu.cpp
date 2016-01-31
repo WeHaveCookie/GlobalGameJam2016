@@ -2,67 +2,11 @@
 
 Menu::Menu()
 {
-    if(!m_texture.loadFromFile(defaultMenuPath+"menu2.png")){
-        //RAISE A LOAD TEXTURE EXCEPTION
-    }
-    m_background.setTexture(m_texture);
-    m_background.setTextureRect(sf::IntRect(0,0,600,400));
-    m_background.setPosition(0.0f,0.0f);
-    // Load Circle for WIND level
-    CircleMenu windLevel;
-    sf::Texture windTexture;
-    sf::CircleShape windShape(50);
-    if(!windTexture.loadFromFile(defaultMenuPath+"wind.png")){
-        //RAISE A LOAD TEXTURE EXCEPTION
-    }
-    windShape.setTexture(&windTexture);
-    windShape.setTextureRect(sf::IntRect(0,0,215,215));
-    windShape.setPosition(sf::Vector2f(10,10));
-    windLevel.circle = windShape;
-    windLevel.level = SelectedLevel::WIND;
-    m_shapes.push_back(windLevel);
-
-    // Load Circle for FIRE level
-    CircleMenu fireLevel;
-    sf::Texture fireTexture;
-    sf::CircleShape fireShape(50);
-    if(!fireTexture.loadFromFile(defaultMenuPath+"fire.png")){
-        //RAISE A LOAD TEXTURE EXCEPTION
-    }
-    fireShape.setTexture(&fireTexture);
-    fireShape.setTextureRect(sf::IntRect(0,0,215,215));
-    fireShape.setPosition(sf::Vector2f(500,100));
-    fireLevel.circle = fireShape;
-    fireLevel.level = SelectedLevel::FIRE;
-    m_shapes.push_back(fireLevel);
-
-    // Load Circle for WATER level
-    CircleMenu waterLevel;
-    sf::Texture waterTexture;
-    sf::CircleShape waterShape(50);
-    if(!waterTexture.loadFromFile(defaultMenuPath+"water.png")){
-        //RAISE A LOAD TEXTURE EXCEPTION
-    }
-    waterShape.setTexture(&waterTexture);
-    waterShape.setTextureRect(sf::IntRect(0,0,215,215));
-    waterShape.setPosition(sf::Vector2f(100,500));
-    waterLevel.circle = waterShape;
-    waterLevel.level = SelectedLevel::WATER;
-    m_shapes.push_back(waterLevel);
-
-    // Load Circle for EARTH level
-    CircleMenu earthLevel;
-    sf::Texture earthTexture;
-    sf::CircleShape earthShape(50);
-    if(!earthTexture.loadFromFile(defaultMenuPath+"earth.png")){
-        //RAISE A LOAD TEXTURE EXCEPTION
-    }
-    earthShape.setTexture(&earthTexture);
-    earthShape.setTextureRect(sf::IntRect(0,0,215,215));
-    earthShape.setPosition(sf::Vector2f(200,200));
-    earthLevel.circle = earthShape;
-    earthLevel.level = SelectedLevel::EARTH;
-    m_shapes.push_back(earthLevel);
+    m_onAnimation = false;
+    m_enable = false;
+    m_animationCounter = 0;
+    build();
+    m_menuState = MenuState::NOTHING;
 }
 
 
@@ -75,21 +19,150 @@ Menu::~Menu()
 
 void Menu::draw(sf::RenderWindow* window)
 {
-    window->draw(m_background);
-    for(int i = 0; i < m_shapes.size(); i++)
+    update(window);
+    window->draw(m_sprite);
+}
+
+void Menu::update(sf::RenderWindow* window)
+// TODO : Fonction qui permet de mettre à jour le personnage dans la fenetre
+{
+    if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
     {
-        window->draw(m_shapes[i].circle);
+        updateAnimation();
+    } else
+    {
+        m_timeSinceLastUpdate += m_TimePerFrame;
     }
 }
 
-SelectedLevel Menu::selectLevel(const sf::FloatRect& query)
+std::string Menu::toString(int i)
 {
-    /*for(std::vector<CircleMenu>::iterator it = m_shapes.begin(); it != m_shapes.end(); it++)
+    switch(i)
     {
-        if(Engine::collisionCircle(query,(*it).circle))
-        {
-            return (*it).level;
-        }
-    }*/
-    return SelectedLevel::NONE;
+        case 0:
+            return "0";
+            break;
+        case 1:
+            return "1";
+            break;
+        case 2:
+            return "2";
+            break;
+        case 3:
+            return "3";
+            break;
+        case 4:
+            return "4";
+            break;
+        case 5:
+            return "5";
+            break;
+        case 6:
+            return "6";
+            break;
+        case 7:
+            return "7";
+            break;
+        case 8:
+            return "8";
+            break;
+        case 9:
+            return "9";
+            break;
+        case 10:
+            return "10";
+            break;
+        case 11:
+            return "11";
+            break;
+        case 12:
+            return "12";
+            break;
+        case 13:
+            return "13";
+            break;
+        case 14:
+            return "14";
+            break;
+        case 15:
+            return "15";
+            break;
+        case 16:
+            return "16";
+            break;
+    }
+}
+
+void Menu::build()
+{
+
+    // Load title
+    for(int i(1);i<15;i++)
+    {
+        sf::Texture* txt = new sf::Texture();
+        std::string str = toString(i);
+        txt->loadFromFile(defaultMenuPath+"Title/Anim_Title_"+str+".png");
+        sf::Sprite sprite;
+        sprite.setTexture(*txt);
+        m_animationTITLE.push_back(sprite);
+    }
+    m_sprite = m_animationTITLE[0];
+
+    // Load Credit
+    sf::Texture* txt = new sf::Texture();
+    txt->loadFromFile(defaultMenuPath+"Credits/creditael.jpg");
+    sf::Sprite sprite;
+    sprite.setTexture(*txt);
+    m_animationCREDIT = sprite;
+
+    for(int i(1);i<5;i++)
+    {
+        sf::Texture* txt = new sf::Texture();
+        std::string str = toString(i);
+        txt->loadFromFile(defaultMenuPath+"Anim_End/Anim_End_"+str+".png");
+        sf::Sprite sprite;
+        sprite.setTexture(*txt);
+        m_animationEND.push_back(sprite);
+    }
+
+
+    sf::Clock tickClock;
+	m_timeSinceLastUpdate = sf::Time::Zero;
+	m_TimePerFrame = sf::seconds(1.f / 60.f);
+	m_duration = sf::seconds(0.05);
+}
+
+void Menu::updateAnimation()
+{
+    m_timeSinceLastUpdate = sf::Time::Zero;
+    switch(m_menuState)
+    {
+        case MenuState::TITLE :
+            m_sprite = m_animationTITLE[m_animationCounter];
+            if(++m_animationCounter >= m_animationTITLE.size())
+            {
+                m_onAnimation = false;
+                m_animationCounter = 0;
+                m_menuState = MenuState::NOTHING;
+                m_enable = false;
+            }
+            break;
+        case MenuState::CREDIT :
+            //std::cout << "Credit " << m_animationCounter << std::endl;
+            m_sprite = m_animationCREDIT;
+            break;
+        case MenuState::END :
+            m_sprite = m_animationEND[m_animationCounter];
+            if(++m_animationCounter >= m_animationEND.size())
+            {
+                m_onAnimation = false;
+                m_animationCounter = 0;
+                m_menuState = MenuState::NOTHING;
+            }
+            break;
+        case MenuState::NOTHING :
+        default:
+            m_sprite = m_animationTITLE[0];
+            break;
+    }
 }

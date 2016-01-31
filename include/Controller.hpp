@@ -47,6 +47,8 @@ class Controller
         bool m_displayMenu;
         sf::View m_viewGame;
         sf::View m_viewHUD;
+        sf::View m_viewMenu;
+
         Level* m_level;
         Engine* m_engine;
 

@@ -27,5 +27,6 @@ struct CircleMenu
 
 enum RuneState {IDLEGAME, IDLEHUD, TAKEN, DROP};
 
+enum MenuState {TITLE, CREDIT, END, NOTHING};
 
 #endif // STRUCTURE_H

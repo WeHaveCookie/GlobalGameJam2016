@@ -16,6 +16,7 @@ Controller::Controller(sf::RenderWindow* window)
     //m_view = m_window->getDefaultView();
     m_viewGame.reset(sf::FloatRect(0, 0, 1920, 960));
     m_viewHUD.reset(sf::FloatRect(0,960,1920,120));
+    m_viewMenu.reset(sf::FloatRect(0,0,1920,1080));
     m_viewGame.setViewport(sf::FloatRect(0,0,1,960.0f/1080.0f));
     m_viewHUD.setViewport(sf::FloatRect(0,960.0f/1080.0f,1,120.0f/1080.f));
     // LOAD MAP FOR TESTING
@@ -94,6 +95,7 @@ int Controller::start()
     m_menuMusic.setVolume(100);
     m_menuMusic.setLoop(true);
     m_displayMenu = true;
+    m_menu->setEnable(true);
     m_pickupRuneSound.setVolume(100);
     //m_mainThemeMusic->play();
     while (m_window->isOpen())
@@ -129,20 +131,6 @@ int Controller::start()
                         case sf::Mouse::Left :
                                 if(m_displayMenu)
                                 {
-                                    std::cout << "Catch click" << std::endl;
-                                    sf::Vector2i cursor = sf::Mouse::getPosition(*m_window);
-                                    sf::FloatRect rect;
-                                    rect.left = cursor.x;
-                                    rect.top = cursor.y;
-                                    rect.width = 10.0f;
-                                    rect.height = 10.0f;
-                                    SelectedLevel level = m_menu->selectLevel(rect);
-                                    if(level != SelectedLevel::NONE)
-                                    {
-                                        m_selectedLevel = level;
-                                        m_displayMenu = false;
-                                        std::cout << "load level : " << m_selectedLevel << std::endl;
-                                    }
                                 } else
                                 {
                                     std::cout << " x : " << m_level->getCaseAt(m_player->getPositionInWorld()).getPosition().x << " y : " << m_level->getCaseAt(m_player->getPositionInWorld()).getPosition().y << std::endl;
@@ -188,9 +176,21 @@ int Controller::start()
             if(m_displayMenu=true)
             {
                 m_pickupRuneSound.play();
+                m_menu->setState(MenuState::TITLE);
                 m_transitionMusic = true;
             }
-            m_displayMenu=false;
+            //m_displayMenu=false;
+        }
+
+        if(sf::Joystick::isButtonPressed(0,2))
+        {
+            if(m_displayMenu=true)
+            {
+                //m_pickupRuneSound.play();
+                m_menu->setState(MenuState::CREDIT);
+                //m_transitionMusic = true;
+            }
+            //m_displayMenu=false;
         }
 
 
@@ -205,38 +205,18 @@ int Controller::start()
         }
 
         m_window->clear();
-        if(m_displayMenu)
+        if(m_displayMenu && m_player->isAlive())
         {
-            m_window->setView(m_viewGame);
-            m_level->drawMap(m_window,m_viewGame);
-            m_player->draw(m_window);
-            m_window->draw(m_filterMenu);
-            m_window->setView(m_viewHUD);
-            displayRune();
-
+            m_window->setView(m_viewMenu);
+            m_menu->draw(m_window);
+            if(!m_menu->isEnable())
+            {
+                m_displayMenu = false;
+            }
         } else if (!m_player->isAlive())
         {
-            m_window->setView(m_viewGame);
-            m_level->drawMap(m_window,m_viewGame);
-            m_player->draw(m_window);
-            //m_window->draw(m_filterMenu);
-            displayDarkSouls();
-            m_window->setView(m_viewHUD);
-            displayRune();
-            /*sf::Clock tickClock;
-            sf::Time m_timeSinceLastUpdate = sf::Time::Zero;
-            sf::Time m_TimePerFrame = sf::seconds(1.f / 60.f);
-            sf::Time m_duration = sf::seconds(0.1);
-            int animationDeath = 0 ;
-            while(animationDeath < 10)
-            {
-                if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
-                {
-                    updateAnimationDeath();
-                } else {
-                    m_timeSinceLastUpdate += m_TimePerFrame;
-                }
-            }*/
+            m_window->setView(m_viewMenu);
+            m_menu->draw(m_window);
         } else
         {
 
@@ -323,6 +303,7 @@ void Controller::moveSouls(sf::Vector2f motion)
         m_engine->move(m_darksouls[i],motion,false);
         if (m_engine->collisionAABB(m_darksouls[i]->getSprite().getGlobalBounds(),m_player->getSprite().getGlobalBounds()))
         {
+            m_menu->setState(MenuState::END);
             m_player->setAlive(false);
         }
     }
