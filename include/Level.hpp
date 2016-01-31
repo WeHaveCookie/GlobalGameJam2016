@@ -2,6 +2,7 @@
 #define LEVEL_HPP
 #include "Reader.h"
 #include "Map.hpp"
+#include "Rune.hpp"
 #include <vector>
 
 class Level : public Reader, public sf::Drawable, public sf::Transformable
@@ -18,11 +19,14 @@ class Level : public Reader, public sf::Drawable, public sf::Transformable
             states.texture = &m_tileset;
             target.draw(m_levelVertices, states);
         }
-        inline const std::vector<Case>& getLevelCases() {return m_levelCases;}
+        inline std::vector<Case> getLevelCases() {return m_levelCases;}
 
-        inline TileType getTypeOfLevelCasesAt(int pos) {return m_levelCases.at(pos).getType();}
-        inline Case getCaseAt(int pos) {return m_levelCases.at(pos);}
-
+        inline TileType getTypeOfLevelCasesAt(int pos) {return m_levelCases[pos].getType();}
+        inline Case getCaseAt(int pos) {return m_levelCases[pos];}
+        Rune* getRuneAt(int pos);
+        void generateRune();
+        bool runeAt(int pos);
+        void disableRuneAt(int pos);
     protected:
     private:
         void read();
@@ -36,9 +40,11 @@ class Level : public Reader, public sf::Drawable, public sf::Transformable
         sf::Vector2i m_levelSize;
         int m_currentMap;
         sf::VertexArray m_levelVertices;
+        std::vector<Rune*> m_rune;
         // Preload
         sf::VertexArray m_levelVerticesPreview;
         std::vector<Case> m_levelCasesPreview;
+
 
 
 };

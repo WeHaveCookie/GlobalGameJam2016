@@ -1,6 +1,6 @@
 #include "../include/FireWall.hpp"
 
-FireWall::FireWall(std::string path, Character* player, sf::Vector2u screenSize, sf::Vector2f pos)
+FireWall::FireWall(std::string path, sf::Vector2u screenSize, sf::Vector2f pos)
 {
     m_speed = DEFAULT_SPEED;
     // On charge la texture
@@ -14,13 +14,11 @@ FireWall::FireWall(std::string path, Character* player, sf::Vector2u screenSize,
     m_sprite.setPosition(m_position);
     m_speed = 1.0f;
     //m_scale = sf::Vector2f(0.0f,screenSize.y / m_sprite.getGlobalBounds().height);
-    m_player = player;
     //ctor
 }
 
 FireWall::~FireWall()
 {
-    delete m_player;
     //dtor
 }
 void FireWall::draw(sf::RenderWindow* window)

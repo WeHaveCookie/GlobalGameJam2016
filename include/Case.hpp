@@ -12,7 +12,7 @@ class Case : public DrawableObject
         void draw(sf::RenderWindow* window);
         void update(sf::RenderWindow* window);
         inline bool isEnable() {return m_enable;}
-        inline bool disable() {m_enable = false;}
+        inline void disable() {m_enable = false;}
         inline sf::Vector2f getPosition() {return m_sprite.getPosition();}
         inline void setPosition(sf::Vector2f f) {m_sprite.setPosition(f);}
         virtual ~Case();
@@ -21,7 +21,8 @@ class Case : public DrawableObject
         sf::Sprite m_sprite;
         bool m_enable;
         TileType m_type;
-        //Rune* m_rune;
+        sf::Vector2f m_position;
+
 };
 
 #endif // CASE_HPP

@@ -89,7 +89,7 @@ void Map::read()
             sprite.setTexture(m_tileset);
             sprite.setTextureRect(sf::IntRect(tu * m_spriteSize.x, tv * m_spriteSize.y,m_spriteSize.x,m_spriteSize.y));
             sprite.setPosition(j * m_spriteSize.x, i * m_spriteSize.y);
-            Case ca = Case(sprite,type);
+            Case* ca = new Case(sprite,type);
             m_cases.push_back(ca);
 
             nextChar();

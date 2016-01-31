@@ -15,7 +15,7 @@ class Map : public Reader, public sf::Drawable, public sf::Transformable
         void createMap();
         void read();
         virtual ~Map();
-        inline std::vector<Case> getCases(){return m_cases;}
+        inline std::vector<Case*> getCases(){return m_cases;}
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
         {
             states.transform *= getTransform();
@@ -30,7 +30,7 @@ class Map : public Reader, public sf::Drawable, public sf::Transformable
     private:
         std::string m_path;
         sf::VertexArray m_vertices;
-        std::vector<Case> m_cases;
+        std::vector<Case*> m_cases;
         sf::Texture m_tileset;
         sf::Vector2i m_mapSize;
         sf::Vector2u m_spriteSize;

@@ -25,5 +25,7 @@ struct CircleMenu
     SelectedLevel level;
 };
 
+enum RuneState {IDLEGAME, IDLEHUD, TAKEN, DROP};
+
 
 #endif // STRUCTURE_H

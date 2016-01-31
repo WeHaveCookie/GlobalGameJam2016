@@ -16,18 +16,12 @@ int main()
     window->setFramerateLimit(60);
     srand(time(NULL));
     //Creation d'un personnage
-    Character* player = new Character("tileset.png");
-    FireWall* wall = new FireWall("fire.jpg", player, window->getSize(), sf::Vector2f(0.0f, 0.0f));
-    Engine* engine = new Engine();
-    Controller* controller = new Controller(window,player,wall,engine);
+
+    Controller* controller = new Controller(window);
     sf::Joystick::update();
 
     controller->start();
 
-    delete player;
-    delete window;
-    delete wall;
-    delete engine;
     delete controller;
     return 0;
 }

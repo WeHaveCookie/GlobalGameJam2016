@@ -9,7 +9,7 @@
 * \param path : Path of sprite character
 * \return
 **/
-Character::Character(std::string path)
+Character::Character(std::string path, Controller* controller)
 {
     m_gravity = DEFAULT_GRAVITY;
     m_speed = DEFAULT_SPEED;
@@ -22,7 +22,7 @@ Character::Character(std::string path)
     m_sprite.setTextureRect(sf::IntRect(0,0,64,64));
     //m_sprite.setScale(0.5,0.5);
     // Position initial du joueur
-    m_positionInWorld = 4500;
+    m_positionInWorld = 3*(PATTERN_WIDTH*PATTERN_NBR);
     m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
     m_sprite.setPosition(m_position);
     m_speed = 2.0f;
@@ -30,6 +30,8 @@ Character::Character(std::string path)
     m_alive = true;
     m_onMove = false;
     m_movingState = MovingState::IDLE;
+    m_controller = controller;
+    m_runeCounter = 0;
     build();
 }
 
@@ -180,6 +182,9 @@ void Character::updatePosition()
         m_movingState = MovingState::IDLE;
         m_onMove = false;
         m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
+        std::cout << "Try to get a rune at " << m_positionInWorld << std::endl;
+        m_controller->getRune(m_positionInWorld);
+
     }
 
 }

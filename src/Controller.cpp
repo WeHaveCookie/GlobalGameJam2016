@@ -1,16 +1,23 @@
 #include "../include/Controller.hpp"
 
-Controller::Controller(sf::RenderWindow* window, Character* character, FireWall* wall, Engine* engine)
+Controller::Controller(sf::RenderWindow* window)
 {
+
+
+    m_engine = new Engine();
     m_window = window;
-    m_player = character;
-    m_fireWall = wall;
     m_menu = new Menu();
     m_displayMenu = false;
-    m_view = m_window->getDefaultView();
-    m_engine = engine;
+    m_victory = false;
+    //m_view = m_window->getDefaultView();
+    m_viewGame.reset(sf::FloatRect(0, 0, 1920, 960));
+    m_viewHUD.reset(sf::FloatRect(0,960,1920,120));
+    m_viewGame.setViewport(sf::FloatRect(0,0,1,960.0f/1080.0f));
+    m_viewHUD.setViewport(sf::FloatRect(0,960.0f/1080.0f,1,120.0f/1080.f));
     // LOAD MAP FOR TESTING
     m_level = new Level(levelPath+"level.lvl");
+    m_player = new Character("tileset.png",this);
+    m_fireWall = new FireWall("fire.jpg", window->getSize(), sf::Vector2f(0.0f, 0.0f));
     m_engine->setMap(m_level);
     m_mainThemeMusic = new sf::Music();
     if (!m_mainThemeMusic->openFromFile(soundPath+"MainTheme.ogg"))
@@ -18,6 +25,24 @@ Controller::Controller(sf::RenderWindow* window, Character* character, FireWall*
         std::cout << "Unable to load " << soundPath+"MainTheme.ogg" <<std::endl;
         //RAISE ERROR
     }
+
+    if(!m_runeTexture.loadFromFile(objectPath + "rune.png"))
+    {
+
+    }
+    sf::Sprite sprite;
+    sprite.setTexture(m_runeTexture);
+    for(int i(0);i<5;i++)
+    {
+        sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+        sprite.setPosition(sf::Vector2f(sf::Vector2f(20.0f+(i*(SPRITE_WIDTH+10)),980.0f)));
+        m_runeHUD.push_back(sprite);
+    }
+
+    if(!m_textureFilterMenu.loadFromFile(filterPath + "menu.png"))
+    {
+    }
+    m_filterMenu.setTexture(m_textureFilterMenu);
     //ctor
 }
 
@@ -51,7 +76,8 @@ int Controller::start()
 
     m_mainThemeMusic->setVolume(100);
     m_mainThemeMusic->setLoop(true);
-    //m_mainThemeMusic.play();
+    m_displayMenu = true;
+    //m_mainThemeMusic->play();
     while (m_window->isOpen())
     {
         // On catch les events
@@ -128,11 +154,21 @@ int Controller::start()
 
         /** AJOUT DE CODE**/
 
+        if(m_runes.size() >= 5)
+        { // VICTORY STATEMENT
+            m_victory = true;
+        }
 
         if (sf::Joystick::isButtonPressed(0, 0)){//"A" button on the XBox 360 controller
             //turbo = 2;
             m_player->setSpeed(4.0f);
         }
+
+        if(sf::Joystick::isButtonPressed(0,7))
+        {
+            m_displayMenu=false;
+        }
+
 
         if (!sf::Joystick::isButtonPressed(0, 0)){
             m_player->setSpeed(2.0f);
@@ -147,54 +183,96 @@ int Controller::start()
         m_window->clear();
         if(m_displayMenu)
         {
-            m_menu->draw(m_window);
+
+            m_window->setView(m_viewGame);
+            m_level->drawMap(m_window,m_viewGame);
+            m_player->draw(m_window);
+            m_window->draw(m_filterMenu);
+            //m_fireWall->draw(m_window);
+            m_window->setView(m_viewHUD);
+            //m_menu->draw(m_window);
+            displayRune();
+
         } else
         {
 
-             //check state of joystick
-            speed = sf::Vector2f(sf::Joystick::getAxisPosition(0, sf::Joystick::X), sf::Joystick::getAxisPosition(0, sf::Joystick::Y));
-
-            timeSinceLastUpdate += tickClock.restart();
-            while (timeSinceLastUpdate > TimePerFrame)
+            if(!m_victory)
             {
-                timeSinceLastUpdate -= TimePerFrame;
+                //check state of joystick
+                speed = sf::Vector2f(sf::Joystick::getAxisPosition(0, sf::Joystick::X), sf::Joystick::getAxisPosition(0, sf::Joystick::Y));
 
-                //update the position of the square according to input from joystick
-                //CHECK DEAD ZONES - OTHERWISE INPUT WILL RESULT IN JITTERY MOVEMENTS WHEN NO INPUT IS PROVIDED
-                //INPUT RANGES FROM -100 TO 100
-                //A 15% DEAD ZONE SEEMS TO WORK FOR ME - GIVE THAT A SHOT
-                if (speed.x > 60.f || speed.x < -60.f || speed.y > 60.f || speed.y < -60.f)
+                timeSinceLastUpdate += tickClock.restart();
+                while (timeSinceLastUpdate > TimePerFrame)
                 {
-                    m_engine->move(m_player,sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(), turbo*speed.y*TimePerFrame.asSeconds()));
-                    std::cout << "Get rune at " << m_player->getPositionInWorld() << " x=" << m_player->getSprite().getPosition().x << " y=" << m_player->getSprite().getPosition().y <<std::endl;
+                    timeSinceLastUpdate -= TimePerFrame;
 
+                    //update the position of the square according to input from joystick
+                    //CHECK DEAD ZONES - OTHERWISE INPUT WILL RESULT IN JITTERY MOVEMENTS WHEN NO INPUT IS PROVIDED
+                    //INPUT RANGES FROM -100 TO 100
+                    //A 15% DEAD ZONE SEEMS TO WORK FOR ME - GIVE THAT A SHOT
+                    if (speed.x > 60.f || speed.x < -60.f || speed.y > 60.f || speed.y < -60.f)
+                    {
+                        m_engine->move(m_player,sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(), turbo*speed.y*TimePerFrame.asSeconds()));
+
+                    }
+                }
+
+
+
+                /** END **/
+
+                float decPlayer = m_player->getSprite().getGlobalBounds().left - m_viewGame.getCenter().x;
+                if((m_viewGame.getSize().x/2) + decPlayer > (m_viewGame.getSize().x*0.66))
+                {
+                    m_viewGame.move(sf::Vector2f(m_player->getSpeed()*2.0,0));
+                    //m_engine->move(m_fireWall,sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
                 }
             }
 
-
-
-            /** END **/
-
-            float decPlayer = m_player->getSprite().getGlobalBounds().left - m_view.getCenter().x;
-            if((m_view.getSize().x/2) + decPlayer > (m_view.getSize().x*0.66))
-            {
-                m_view.move(sf::Vector2f(m_player->getSpeed()*2.0,0));
-                //m_engine->move(m_fireWall,sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
-            }
-            //m_view.move(1,0);
-            m_window->setView(m_view);
-            m_level->drawMap(m_window,m_view);
+            //m_viewGame.move(1,0);
+            m_window->setView(m_viewGame);
+            m_level->drawMap(m_window,m_viewGame);
             m_player->draw(m_window);
             //m_fireWall->draw(m_window);
+
+            m_window->setView(m_viewHUD);
+            displayRune();
 
         }
         m_window->display();
     }
     m_mainThemeMusic->stop();
     delete m_mainThemeMusic;
+    return 0;
 }
 
 void Controller::setLevel(std::string path)
 {
     m_level = new Level(path);
+}
+
+void Controller::displayRune()
+{
+    for(int i(0); i<m_runeHUD.size();i++)
+    {
+        m_window->draw(m_runeHUD[i]);
+    }
+    for(int i(0); i<m_runes.size();i++)
+    {
+        if(m_runes[i]->getState() != RuneState::TAKEN)
+        {
+            m_runes[i]->draw(m_window);
+        }
+    }
+}
+
+void Controller::getRune(int pos)
+{
+    if(m_level->runeAt(pos))
+        {
+            Rune* rune = m_level->getRuneAt(pos);
+            rune->taken(m_runes.size());
+            m_runes.push_back(rune);
+            std::cout << "I have a rune !! Yeah so " << m_runes.size() << " rune now gangsta !" << std::endl;
+        }
 }

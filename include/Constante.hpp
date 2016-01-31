@@ -15,7 +15,7 @@
 // Constant for Tile
 #define PATTERN_HEIGHT 15
 #define PATTERN_WIDTH 30
-#define PATTERN_NBR 50
+#define PATTERN_NBR 10
 
 std::string const defaultCharPath = "Ressources/Character/";
 std::string const defaultTilePath = "Ressources/Tileset/";
@@ -26,4 +26,5 @@ std::string const levelPath = "Ressources/Level/";
 std::string const soundPath = "Ressources/Sound/Musique/";
 std::string const patternPath = "Ressources/Pattern/Pattern";
 std::string const objectPath = "Ressources/Object/";
+std::string const filterPath = "Ressources/Filter/";
 #endif // CONSTANTES_HPP
