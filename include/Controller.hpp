@@ -2,18 +2,14 @@
 #define CONTROLLER_HPP
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream>
 #include <time.h>
-#include "Engine.hpp"
 
+#include "Engine.hpp"
 #include "Character.hpp"
 #include "DarkSoul.hpp"
 #include "Menu.hpp"
 #include "Structure.hpp"
 #include "Level.hpp"
-
 
 class Character;
 class Engine;
@@ -23,6 +19,9 @@ class Controller
 {
     public:
         Controller(sf::RenderWindow* window);
+        virtual ~Controller();
+
+        // Function
         int start();
         void setLevel(std::string path);
         void getRune(int pos);
@@ -30,20 +29,25 @@ class Controller
         void growSpeed();
         void displayDarkSouls();
         void moveSouls(sf::Vector2f motion);
+
+        // Inline
         inline sf::RenderWindow* getWindow() {return m_window;}
-        inline void setLevel(SelectedLevel level) {m_selectedLevel = level;}
         inline void displayMenu(bool b) {m_displayMenu = b;}
         inline Level* getLevel() {return m_level;}
-        virtual ~Controller();
+
     protected:
     private:
+        // Function
         void update();
         void updateMusic();
+        void reload();
+        void init();
+
+        // Attribut
         sf::RenderWindow* m_window;
         Character* m_player;
         std::vector<DarkSoul*> m_darksouls;
         Menu* m_menu;
-        SelectedLevel m_selectedLevel;
         bool m_displayMenu;
         sf::View m_viewGame;
         sf::View m_viewHUD;
@@ -55,6 +59,8 @@ class Controller
         //Sound
         sf::Music m_mainThemeMusic;
         sf::Music m_menuMusic;
+        sf::Music m_creditsMusic;
+
         std::vector<Rune*> m_runes;
         bool m_victory;
         sf::Sprite m_filterMenu;

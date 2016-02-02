@@ -5,16 +5,12 @@ Menu::Menu()
     m_onAnimation = false;
     m_enable = false;
     m_animationCounter = 0;
-    build();
     m_menuState = MenuState::NOTHING;
+    build();
 }
-
-
-
 
 Menu::~Menu()
 {
-    //dtor
 }
 
 void Menu::draw(sf::RenderWindow* window)
@@ -24,7 +20,6 @@ void Menu::draw(sf::RenderWindow* window)
 }
 
 void Menu::update(sf::RenderWindow* window)
-// TODO : Fonction qui permet de mettre à jour le personnage dans la fenetre
 {
     if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
     {
@@ -35,6 +30,7 @@ void Menu::update(sf::RenderWindow* window)
     }
 }
 
+/** TODO : CHANGE THIS HORRIBLE FUNCTION !!!**/
 std::string Menu::toString(int i)
 {
     switch(i)
@@ -115,7 +111,8 @@ void Menu::build()
     sprite.setTexture(*txt);
     m_animationCREDIT = sprite;
 
-    for(int i(1);i<5;i++)
+    // Load End
+    for(int i(1);i<6;i++)
     {
         sf::Texture* txt = new sf::Texture();
         std::string str = toString(i);
@@ -124,7 +121,6 @@ void Menu::build()
         sprite.setTexture(*txt);
         m_animationEND.push_back(sprite);
     }
-
 
     sf::Clock tickClock;
 	m_timeSinceLastUpdate = sf::Time::Zero;
@@ -148,7 +144,6 @@ void Menu::updateAnimation()
             }
             break;
         case MenuState::CREDIT :
-            //std::cout << "Credit " << m_animationCounter << std::endl;
             m_sprite = m_animationCREDIT;
             break;
         case MenuState::END :

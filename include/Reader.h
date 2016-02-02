@@ -10,15 +10,18 @@ class Reader
         Reader(const std::string & filePath);
         virtual ~Reader();
     protected:
-        //Function//
+        //Function
         void open(const std::string & filePath);
         bool endFile();
         virtual void read()=0;
         void nextChar();
         std::string nextWord();
-        inline void close() {m_file.close();}
         void skipSeparator();
-                //Attributes//
+
+        // Inline
+        inline void close() {m_file.close();}
+
+        //Attributes
         std::fstream m_file;
         std::string m_filePath;
         char m_curChar;

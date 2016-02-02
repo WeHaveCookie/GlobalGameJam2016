@@ -2,8 +2,6 @@
 
 Controller::Controller(sf::RenderWindow* window)
 {
-
-
     m_engine = new Engine();
     m_window = window;
     m_menu = new Menu();
@@ -13,40 +11,50 @@ Controller::Controller(sf::RenderWindow* window)
     m_darksoulsSpeed = DEFAULT_SPEED;
     m_speedPlayer = DEFAULT_SPEED;
     m_pitch = 1;
-    //m_view = m_window->getDefaultView();
+
+    // Setting view
     m_viewGame.reset(sf::FloatRect(0, 0, 1920, 960));
     m_viewHUD.reset(sf::FloatRect(0,960,1920,120));
     m_viewMenu.reset(sf::FloatRect(0,0,1920,1080));
     m_viewGame.setViewport(sf::FloatRect(0,0,1,960.0f/1080.0f));
     m_viewHUD.setViewport(sf::FloatRect(0,960.0f/1080.0f,1,120.0f/1080.f));
-    // LOAD MAP FOR TESTING
+
+    // Load level
     m_level = new Level(levelPath+"level.lvl");
     m_player = new Character("tileset.png",this);
+
+    // Load Darksouls
     for(int i(0);i<16;i++)
     {
         m_darksouls.push_back(new DarkSoul("darksoul.png", (i)*(PATTERN_WIDTH*PATTERN_NBR)));
     }
+
+    // Set engine
     m_engine->setMap(m_level);
+
+    // Load Music
     m_transitionMusic = false;
     if (!m_mainThemeMusic.openFromFile(soundPath+"MainTheme.ogg"))
-    {
-        std::cout << "Unable to load " << soundPath+"MainTheme.ogg" <<std::endl;
-        //RAISE ERROR
-    }
-    if (!m_menuMusic.openFromFile(soundPath+"SoulMenu.ogg"))
-    {
-        std::cout << "Unable to load " << soundPath+"SoulMenu.ogg" <<std::endl;
-        //RAISE ERROR
-    }
-    if(!m_pickupRuneSound.openFromFile(fxPath+"Soul_AmeFeedback_SFX_OS.ogg"))
-    {
+    { //RAISE ERROR
     }
 
+    if (!m_menuMusic.openFromFile(soundPath+"SoulMenu.ogg"))
+    { //RAISE ERROR
+    }
+
+    if(!m_pickupRuneSound.openFromFile(fxPath+"Soul_AmeFeedback_SFX_OS.ogg"))
+    { //RAISE ERROR
+    }
+
+    if(!m_creditsMusic.openFromFile(soundPath+"SoulCredits.ogg"))
+    { //RAISE ERROR
+    }
 
     if(!m_runeTexture.loadFromFile(objectPath + "rune.png"))
-    {
-
+    { //RAISE ERROR
     }
+
+    // Load rune HUD
     sf::Sprite sprite;
     sprite.setTexture(m_runeTexture);
     for(int i(0);i<5;i++)
@@ -55,13 +63,6 @@ Controller::Controller(sf::RenderWindow* window)
         sprite.setPosition(sf::Vector2f(sf::Vector2f(20.0f+(i*(SPRITE_WIDTH+10)),980.0f)));
         m_runeHUD.push_back(sprite);
     }
-
-    if(!m_textureFilterMenu.loadFromFile(filterPath + "menu.png"))
-    {
-    }
-    m_filterMenu.setTexture(m_textureFilterMenu);
-
-    //ctor
 }
 
 Controller::~Controller()
@@ -71,36 +72,35 @@ Controller::~Controller()
     delete m_menu;
     delete m_level;
     delete m_engine;
-    //m_mainThemeMusic->stop();
-
-    //dtor        sf::RenderWindow* m_window;
 }
 
 int Controller::start()
 {
 
-    bool move = false;//indicate whether motion is detected
-	int turbo = 1;//indicate whether player is using button for turbo speed ;)
-    //for movement
+    bool move = false;
+	int turbo = 1;
 	sf::Vector2f speed = sf::Vector2f(0.f,0.f);
 
-	//time
 	sf::Clock tickClock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
 	sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
 	sf::Time duration = sf::Time::Zero;
 
+    // Setting Music
     m_mainThemeMusic.setVolume(100);
     m_mainThemeMusic.setLoop(true);
     m_menuMusic.setVolume(100);
     m_menuMusic.setLoop(true);
+    m_creditsMusic.setVolume(100);
+    m_creditsMusic.setLoop(true);
+    m_pickupRuneSound.setVolume(100);
+
+    // Setting Menu
     m_displayMenu = true;
     m_menu->setEnable(true);
-    m_pickupRuneSound.setVolume(100);
-    //m_mainThemeMusic->play();
     while (m_window->isOpen())
     {
-        // On catch les events
+        // Catching event
         sf::Event event;
         while (m_window->pollEvent(event))
         {
@@ -116,9 +116,6 @@ int Controller::start()
                             case sf::Keyboard::Escape :
                                 m_window->close();
                                 break;
-                            case sf::Keyboard::A :
-                                m_displayMenu = true;
-                                break;
                             default :
                                 break;
                         }
@@ -129,13 +126,6 @@ int Controller::start()
                         switch(event.mouseButton.button)
                         {
                         case sf::Mouse::Left :
-                                if(m_displayMenu)
-                                {
-                                } else
-                                {
-                                    std::cout << " x : " << m_level->getCaseAt(m_player->getPositionInWorld()).getPosition().x << " y : " << m_level->getCaseAt(m_player->getPositionInWorld()).getPosition().y << std::endl;
-                                    std::cout << " char x : " << m_player->getSprite().getPosition().x << " y : " << m_player->getSprite().getPosition().y << std::endl;
-                                }
                             break;
                         case sf::Mouse::Right:
                             break;
@@ -149,64 +139,73 @@ int Controller::start()
             }
             if (event.type == sf::Event::JoystickMoved){
 				move = true;
-				//std::cout << "X axis: " << speed.x << std::endl;
-				//std::cout << "Y axis: " << speed.y << std::endl;
             }
             else{
                 move = false;
             }
         }
 
-
-        /** AJOUT DE CODE**/
+        // Update Music
         updateMusic();
+
+        // Victory
         if(m_runes.size() >= 5)
         { // VICTORY STATEMENT
             m_victory = true;
         }
 
-        if (sf::Joystick::isButtonPressed(0, 0)){//"A" button on the XBox 360 controller
-            //turbo = 2;
-
+        // Catch gamepad event
+        if (sf::Joystick::isButtonPressed(0, 0))
+        {// A button
             m_player->setSpeed(m_speedPlayer*2.0f);
         }
 
         if(sf::Joystick::isButtonPressed(0,7))
-        {
+        { // Start button
             if(m_displayMenu=true)
             {
+                m_creditsMusic.stop();
                 m_pickupRuneSound.play();
                 m_menu->setState(MenuState::TITLE);
                 m_transitionMusic = true;
             }
-            //m_displayMenu=false;
+        }
+
+        if(sf::Joystick::isButtonPressed(0,3))
+        { // Y button
+            if(m_displayMenu=true)
+            {
+                m_creditsMusic.stop();
+                m_menuMusic.play();
+                m_menu->setState(MenuState::NOTHING);
+            }
         }
 
         if(sf::Joystick::isButtonPressed(0,2))
-        {
+        { // X button
             if(m_displayMenu=true)
             {
-                //m_pickupRuneSound.play();
+                m_menuMusic.stop();
+                m_creditsMusic.play();
                 m_menu->setState(MenuState::CREDIT);
-                //m_transitionMusic = true;
             }
             //m_displayMenu=false;
         }
 
-
-        if (!sf::Joystick::isButtonPressed(0, 0)){
+        if (!sf::Joystick::isButtonPressed(0, 0))
+        {
             m_player->setSpeed(m_speedPlayer);
-            //turbo = 1;
         }
 
-        if(sf::Joystick::isButtonPressed(0,1)){//"B" button on the XBox 360 controller
+        if(sf::Joystick::isButtonPressed(0,1))
+        {// B button
             m_window->close();
-            return 0;
+            break;
         }
 
         m_window->clear();
         if(m_displayMenu && m_player->isAlive())
-        {
+        { // Display menu
             m_window->setView(m_viewMenu);
             m_menu->draw(m_window);
             if(!m_menu->isEnable())
@@ -214,18 +213,21 @@ int Controller::start()
                 m_displayMenu = false;
             }
         } else if (!m_player->isAlive())
-        {
+        { // Display dead
+            if(!m_menu->isEnable())
+            {
+                //Restart
+
+            }
             m_window->setView(m_viewMenu);
             m_menu->draw(m_window);
         } else
-        {
-
+        { // Display game
             if(!m_victory)
             {
-                //check state of joystick
                 speed = sf::Vector2f(sf::Joystick::getAxisPosition(0, sf::Joystick::X), sf::Joystick::getAxisPosition(0, sf::Joystick::Y));
-
                 timeSinceLastUpdate += tickClock.restart();
+
                 while (timeSinceLastUpdate > TimePerFrame)
                 {
                     timeSinceLastUpdate -= TimePerFrame;
@@ -240,34 +242,35 @@ int Controller::start()
                     }
                 }
 
-
-
-                /** END **/
-
+                // Setting view
                 float decPlayer = m_player->getSprite().getGlobalBounds().left - m_viewGame.getCenter().x;
                 if((m_viewGame.getSize().x/2) + decPlayer > (m_viewGame.getSize().x*0.66))
                 {
                     m_viewGame.move(sf::Vector2f(m_player->getSpeed()*2.0,0));
                     moveSouls(sf::Vector2f(m_player->getSpeed()*2.0,0.0));
-                    //m_engine->move(m_darksoul,sf::Vector2f(sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(),0.0)));
                 }
                 m_viewGame.move(m_viewSpeed,0);
                 moveSouls(sf::Vector2f(m_darksoulsSpeed,0.0));
             }
 
-
+            // Draw on view Game
             m_window->setView(m_viewGame);
             m_level->drawMap(m_window,m_viewGame);
             m_player->draw(m_window);
             displayDarkSouls();
 
+            // Draw on view HUD
             m_window->setView(m_viewHUD);
             displayRune();
+
+            // Grow up speed of game
             growSpeed();
         }
         m_window->display();
     }
     m_mainThemeMusic.stop();
+    m_menuMusic.stop();
+    m_creditsMusic.stop();
     return 0;
 }
 
@@ -281,13 +284,11 @@ void Controller::growSpeed()
 
     if(rb < 10)
     {
-
         m_pitch += pitch;
         m_viewSpeed+=motion;
         m_darksoulsSpeed+=motion;
         m_speedPlayer+=motion;
         m_player->setSpeed(m_speedPlayer);
-        std::cout << "Grow speed " << motion << " and pitch " << m_pitch << std::endl;
     }
 }
 
@@ -336,9 +337,6 @@ void Controller::updateMusic()
 {
     if(m_transitionMusic)
     {
-        //std::cout << "Set attenuation at " << m_counterTransitionMusic << std::endl;
-
-
         m_menuMusic.setVolume(100-m_counterTransitionMusic);
         m_mainThemeMusic.setVolume(m_counterTransitionMusic);
         if(++m_counterTransitionMusic > 100)
@@ -356,7 +354,7 @@ void Controller::updateMusic()
         if(m_displayMenu)
         {
             if(m_menuMusic.getStatus() != sf::SoundSource::Status::Playing)
-            {
+            {////////
                 m_menuMusic.play();
             }
         } else
@@ -365,11 +363,9 @@ void Controller::updateMusic()
             {
                 m_mainThemeMusic.play();
             }
-            //std::cout << "Pitch : " << m_pitch << std::endl;
             m_mainThemeMusic.setPitch(m_pitch);
         }
     }
-
 }
 
 void Controller::getRune(int pos)
@@ -380,6 +376,5 @@ void Controller::getRune(int pos)
             Rune* rune = m_level->getRuneAt(pos);
             rune->taken(m_runes.size());
             m_runes.push_back(rune);
-            std::cout << "I have a rune !! Yeah so " << m_runes.size() << " rune now gangsta !" << std::endl;
         }
 }

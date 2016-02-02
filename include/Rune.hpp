@@ -1,11 +1,8 @@
 #ifndef RUNE_HPP
 #define RUNE_HPP
+#include <time.h>
 #include "DrawableObject.hpp"
 #include "Constante.hpp"
-#include <stdlib.h>
-#include <stdio.h>
-#include <iostream>
-#include <time.h>
 #include "Structure.hpp"
 
 
@@ -13,20 +10,27 @@ class Rune : public DrawableObject
 {
     public:
         Rune(std::string path, int pos);
-        void setPosition(sf::Vector2f pos);
         virtual ~Rune();
+
+        // Function
+        void setPosition(sf::Vector2f pos);
         void draw(sf::RenderWindow* window);
         void update(sf::RenderWindow* window);
         void updateAnimation();
+        void taken(int pos);
+
+        // Inline
         inline void setEnable(bool b) {m_enable = b;}
         inline bool isEnable() {return m_enable;}
         inline sf::Sprite getSprite() {return m_sprite;}
         inline int getPositionInWorld() {return m_posInWorld;}
-        void taken(int pos);
         inline RuneState getState() {return m_state;}
     protected:
     private:
+        // Function
         void build();
+
+        // Attribut
         sf::Sprite m_sprite;
         sf::Texture m_texture;
         sf::Vector2f m_position;
@@ -47,5 +51,4 @@ class Rune : public DrawableObject
         int m_posOnHUD;
         bool m_taken;
 };
-
 #endif // RUNE_HPP

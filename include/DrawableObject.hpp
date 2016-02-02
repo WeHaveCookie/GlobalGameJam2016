@@ -16,7 +16,5 @@ class DrawableObject
         virtual void update(sf::RenderWindow* window);
         int m_positionInWorld;
     private:
-        //int m_positionInWorld;
 };
-
 #endif // DRAWABLEOBJECT_HPP

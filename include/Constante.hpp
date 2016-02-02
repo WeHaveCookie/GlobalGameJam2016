@@ -5,9 +5,6 @@
 #define DEFAULT_GRAVITY 9.81
 #define DEFAULT_SPEED 1
 
-// Constant for Quadtree
-#define QUAD_NODE_CAPACITY 10
-
 // Constant for Sprite
 #define SPRITE_WIDTH 64
 #define SPRITE_HEIGHT 64

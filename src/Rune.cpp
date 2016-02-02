@@ -2,29 +2,29 @@
 
 Rune::Rune(std::string path, int pos)
 {
+    // Load texture
     if(!m_texture.loadFromFile(objectPath+path))
-    {
-
+    { // RAISE ERROR
     }
     m_texture.setSmooth(true);
     m_sprite.setTexture(m_texture);
     m_sprite.setTextureRect(sf::IntRect(0,0,64,64));
+
     m_enable = true;
     m_posInWorld = pos;
     m_position = sf::Vector2f((m_posInWorld%(PATTERN_WIDTH*PATTERN_NBR)) * SPRITE_WIDTH,floor(m_posInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
     m_sprite.setPosition(m_position);
+
     m_state = RuneState::IDLEGAME;
     m_posOnHUD = -1;
     m_taken = false;
+
     build();
-    //ctor
 }
 
 Rune::~Rune()
 {
-    //dtor
 }
-
 
 void Rune::draw(sf::RenderWindow* window)
 {
@@ -148,8 +148,6 @@ void Rune::taken(int pos)
 
 void Rune::setPosition(sf::Vector2f pos)
 {
-    //std::cout << "Pposition x=" << pos.x << " y= " << pos.y << std::endl;
     m_position = pos;
     m_sprite.setPosition(m_position);
-    //std::cout << "Sprite x=" << m_sprite.getPosition().x << " y= " << m_sprite.getPosition().y << std::endl;
 }

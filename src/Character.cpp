@@ -1,32 +1,24 @@
 #include "../include/Character.hpp"
 
-/**
-*
-* \fn Character(std::string path)
-*
-* \brief Basic constructor of Character
-*
-* \param path : Path of sprite character
-* \return
-**/
 Character::Character(std::string path, Controller* controller)
 {
     m_gravity = DEFAULT_GRAVITY;
     m_speed = DEFAULT_SPEED;
-    // On charge la texture
-    if(!m_texture.loadFromFile(defaultCharPath+path)){
-        //RAISE A LOAD TEXTURE EXCEPTION
+
+    // Load texture
+    if(!m_texture.loadFromFile(defaultCharPath+path))
+    { //RAISE A LOAD TEXTURE EXCEPTION
     }
+
     m_texture.setSmooth(true);
     m_sprite.setTexture(m_texture);
     m_sprite.setTextureRect(sf::IntRect(0,0,64,64));
-    //m_sprite.setScale(0.5,0.5);
-    // Position initial du joueur
+
+    // Position init player
     m_positionInWorld = 7*(PATTERN_WIDTH*PATTERN_NBR)+7;
     m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
     m_sprite.setPosition(m_position);
     m_speed = 2.0f;
-
     m_alive = true;
     m_onMove = false;
     m_endAnimationDead = false;
@@ -36,46 +28,17 @@ Character::Character(std::string path, Controller* controller)
     build();
 }
 
-/**
-*
-* \fn ~Character()
-*
-* \brief Basic destructor of Character
-*
-* \param
-* \return
-**/
 Character::~Character()
-// TODO : Destructeur de la classe personnage.
 {
-    //dtor
 }
 
-/**
-* \fn draw(sf::RenderWindow* window)
-*
-* \brief Draw character on window
-*
-* \param window : The RenderWindow
-* \return void
-**/
 void Character::draw(sf::RenderWindow* window)
-// TODO : Fonction qui permet de dessiner le personnage dans la fenetre
 {
     update(window);
     window->draw(m_sprite);
 }
 
-/**
-* \fn update(sf::RenderWindow* window)
-*
-* \brief Update character on window
-*
-* \param window : The RenderWindow
-* \return void
-**/
 void Character::update(sf::RenderWindow* window)
-// TODO : Fonction qui permet de mettre à jour le personnage dans la fenetre
 {
     if(m_alive)
     {
@@ -100,18 +63,9 @@ void Character::update(sf::RenderWindow* window)
                 m_timeSinceLastUpdate += m_TimePerFrame;
             }
         }
-        //std::cout << "Player Dead" << std::endl;
     }
-
 }
-/**
-* \fn move(sf::Vector2f motion, Quadtree* universe)
-*
-* \brief Move character if possible and correct
-*
-* \param motion : Motion Vector, universe : Quadtree which represents world
-* \return void
-**/
+
 void Character::move(sf::Vector2f motion)
 {
     if(!m_onMove)
@@ -119,15 +73,12 @@ void Character::move(sf::Vector2f motion)
         m_onMove = true;
         m_motion = motion*(float)SPRITE_HEIGHT;
     }
-
-    //m_positionInWorld += motion.x + motion.y*PATTERN_WIDTH;
 }
-
 
 void Character::updatePosition()
 {
     if(m_motion.x > 0)
-    { // On vas à droite
+    { // Go to RIGHT
         m_position.x += 2*m_speed;
         m_motion.x -= 2*m_speed;
         m_movingState = MovingState::RIGHT;
@@ -137,7 +88,7 @@ void Character::updatePosition()
             m_motion.x = 0;
         }
     } else if (m_motion.x < 0)
-    { // On vas à gauche
+    { // Go to LEFT
         m_position.x -= 2*m_speed;
         m_motion.x += 2*m_speed;
         m_movingState = MovingState::LEFT;
@@ -147,7 +98,7 @@ void Character::updatePosition()
             m_motion.x = 0;
         }
     } else if(m_motion.y > 0)
-    { // on vas en bas
+    { // Go to DOWN
         m_position.y += 2*m_speed;
         m_motion.y -= 2*m_speed;
         m_movingState = MovingState::DOWN;
@@ -157,7 +108,7 @@ void Character::updatePosition()
             m_motion.y = 0;
         }
     } else if (m_motion.y < 0)
-    { // on vas en haut
+    { // Go to UP
         m_position.y -= 2*m_speed;
         m_motion.y += 2*m_speed;
         m_movingState = MovingState::UP;
@@ -167,8 +118,7 @@ void Character::updatePosition()
             m_motion.y = 0;
         }
     } else
-    { // Fin du mouvement
-        //std::cout << "Motion x=" << m_motion.x << " y=" << m_motion.y << std::endl;
+    { // End of mouvment
         switch(m_movingState)
         {
             case RIGHT :
@@ -193,17 +143,15 @@ void Character::updatePosition()
         m_onMove = false;
         m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
         m_controller->getRune(m_positionInWorld);
-
     }
-
 }
 
 void Character::build()
 {
-    //std::cout << "build char" << std::endl;
     sf::Sprite sprite;
     m_texture.setSmooth(true);
     sprite.setTexture(m_texture);
+
     // Set animation IDLE
     sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,0,SPRITE_WIDTH,SPRITE_HEIGHT));
     m_animationIDLE.push_back(sprite);
@@ -279,7 +227,6 @@ void Character::build()
     m_animationDOWN.push_back(sprite);
     sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*5,SPRITE_HEIGHT*4,SPRITE_WIDTH,SPRITE_HEIGHT));
     m_animationDOWN.push_back(sprite);
-    m_animationCounter = 0;
 
     // set animation DEATH
     sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
@@ -305,59 +252,56 @@ void Character::build()
     sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*10,SPRITE_HEIGHT*5,SPRITE_WIDTH,SPRITE_HEIGHT));
     m_animationDEAD.push_back(sprite);
 
-
+    m_animationCounter = 0;
     sf::Clock tickClock;
 	m_timeSinceLastUpdate = sf::Time::Zero;
 	m_TimePerFrame = sf::seconds(1.f / 60.f);
 	m_duration = sf::seconds(0.1);
-	//std::cout << "TimeSince : " << m_timeSinceLastUpdate.asSeconds() << " TimeFrame : " << m_TimePerFrame.asSeconds() << " duration : " << m_duration.asSeconds() << std::endl;
-    //std::cout << "build success" << std::endl;
 }
 
 void Character::updateAnimation()
 {
     m_timeSinceLastUpdate = sf::Time::Zero;
-    //std::cout << "Update Animation " << m_movingState << " counter : " << m_animationCounter << std::endl;
     switch(m_movingState)
     {
         case MovingState::IDLE:
             m_sprite.setTextureRect(m_animationIDLE[m_animationCounter].getTextureRect());
-            if(++m_animationCounter >= m_animationIDLE.size())
+            if(++m_animationCounter >= (int)m_animationIDLE.size())
             {
                 m_animationCounter = 0;
             }
             break;
         case MovingState::UP:
             m_sprite.setTextureRect(m_animationUP[m_animationCounter].getTextureRect());
-            if(++m_animationCounter >= m_animationUP.size())
+            if(++m_animationCounter >= (int)m_animationUP.size())
             {
                 m_animationCounter = 0;
             }
             break;
         case MovingState::RIGHT:
             m_sprite.setTextureRect(m_animationRIGHT[m_animationCounter].getTextureRect());
-            if(++m_animationCounter >= m_animationRIGHT.size())
+            if(++m_animationCounter >= (int)m_animationRIGHT.size())
             {
                 m_animationCounter = 0;
             }
             break;
         case MovingState::LEFT:
             m_sprite.setTextureRect(m_animationLEFT[m_animationCounter].getTextureRect());
-            if(++m_animationCounter >= m_animationLEFT.size())
+            if(++m_animationCounter >= (int)m_animationLEFT.size())
             {
                 m_animationCounter = 0;
             }
             break;
         case MovingState::DOWN:
             m_sprite.setTextureRect(m_animationDOWN[m_animationCounter].getTextureRect());
-            if(++m_animationCounter >= m_animationDOWN.size())
+            if(++m_animationCounter >= (int)m_animationDOWN.size())
             {
                 m_animationCounter = 0;
             }
             break;
         case MovingState::DEAD:
             m_sprite.setTextureRect(m_animationDEAD[m_animationCounter].getTextureRect());
-            if(++m_animationCounter >= m_animationDOWN.size())
+            if(++m_animationCounter >= (int)m_animationDOWN.size())
             {
                 m_endAnimationDead = true;
                 m_animationCounter = 0;

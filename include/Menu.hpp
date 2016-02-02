@@ -2,24 +2,31 @@
 #define MENU_HPP
 #include "Structure.hpp"
 #include "Constante.hpp"
-#include "Engine.hpp"
-
 
 class Menu
 {
     public:
         Menu();
+        virtual ~Menu();
+
+        // Function
         void draw(sf::RenderWindow* window);
         void update(sf::RenderWindow* window);
         void updateAnimation();
+
+        // Inline
         inline bool isEnable() {return m_enable;}
         inline void setEnable(bool b) {m_enable = b;}
         inline void setState(MenuState st) {m_menuState = st;}
         inline void onAnimation() {m_onAnimation = true;}
-        virtual ~Menu();
+        inline bool isAnimated() {return m_onAnimation;}
+
     protected:
     private:
+        // Function
         void build();
+
+        // Attribut
         std::string toString(int i);
         sf::Texture m_texture;
         sf::Sprite m_sprite;
@@ -33,7 +40,5 @@ class Menu
         bool m_onAnimation;
         MenuState m_menuState;
         bool m_enable;
-
 };
-
 #endif // MENU_HPP

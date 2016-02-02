@@ -9,29 +9,34 @@ class Level : public Reader, public sf::Drawable, public sf::Transformable
 {
     public:
         Level(const std::string& path);
-        void loadPattern(const std::string& path, int pattern);
-        void drawMap(sf::RenderWindow* window, sf::View view);
         virtual ~Level();
 
-        virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
+        // Function
+        void loadPattern(const std::string& path, int pattern);
+        void drawMap(sf::RenderWindow* window, sf::View view);
+        Rune* getRuneAt(int pos);
+        void generateRune();
+        bool runeAt(int pos);
+        void disableRuneAt(int pos);
+
+        // Inline
+        inline virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
         {
             states.transform *= getTransform();
             states.texture = &m_tileset;
             target.draw(m_levelVertices, states);
         }
         inline std::vector<Case> getLevelCases() {return m_levelCases;}
-
         inline TileType getTypeOfLevelCasesAt(int pos) {return m_levelCases[pos].getType();}
         inline Case getCaseAt(int pos) {return m_levelCases[pos];}
-        Rune* getRuneAt(int pos);
-        void generateRune();
-        bool runeAt(int pos);
-        void disableRuneAt(int pos);
     protected:
     private:
+        // Function
         void read();
         void buildLevel();
         void generatePattern(int* tab, const int& nbrPattern, const int& nbrGen);
+
+        // Attribut
         std::string m_path;
         std::vector<Map*> m_maps;
         std::vector<Case> m_levelCases;
@@ -41,12 +46,5 @@ class Level : public Reader, public sf::Drawable, public sf::Transformable
         int m_currentMap;
         sf::VertexArray m_levelVertices;
         std::vector<Rune*> m_rune;
-        // Preload
-        sf::VertexArray m_levelVerticesPreview;
-        std::vector<Case> m_levelCasesPreview;
-
-
-
 };
-
 #endif // LEVEL_HPP

@@ -2,10 +2,7 @@
 #define ENGINE_HPP
 #include "Structure.hpp"
 #include "Level.hpp"
-#include "Character.hpp"
 #include "DrawableObject.hpp"
-
-#define DEBUG 0
 
 class Engine
 {
@@ -13,10 +10,13 @@ class Engine
         Engine(Level* level);
         Engine();
         virtual ~Engine();
+
+        // Function
         bool collisionCircle(sf::FloatRect box1, sf::CircleShape circle);
         bool collisionAABB(sf::FloatRect box1, sf::FloatRect box2);
         bool move(DrawableObject* obj, const sf::Vector2f& motion, bool collision = true);
-        /*bool jump(sf::FloatRect box1, sf::Vector2f motion, Quadtree* universe);*/
+
+        // Inline
         inline void setMap(Level* level) {m_level = level;}
     protected:
     private:

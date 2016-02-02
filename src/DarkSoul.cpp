@@ -3,26 +3,25 @@
 DarkSoul::DarkSoul(std::string path, int pos)
 {
     m_speed = DEFAULT_SPEED;
-    // On charge la texture
-    if(!m_texture.loadFromFile(defaultCharPath+path)){
-        //RAISE A LOAD TEXTURE EXCEPTION
+
+    // Load texture
+    if(!m_texture.loadFromFile(defaultCharPath+path))
+    { //RAISE A LOAD TEXTURE EXCEPTION
     }
     m_sprite.setTexture(m_texture);
     m_sprite.setTextureRect(sf::IntRect(0,0,64,64));
-    // Position initial du wall
+
+    // Init pos of DarkSoul
     m_positionInWorld = pos;
     m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
     m_sprite.setPosition(m_position);
     m_speed = 1.0f;
     m_animationCounter = 0;
     build();
-    //m_scale = sf::Vector2f(0.0f,screenSize.y / m_sprite.getGlobalBounds().height);
-    //ctor
 }
 
 DarkSoul::~DarkSoul()
 {
-    //dtor
 }
 void DarkSoul::draw(sf::RenderWindow* window)
 {
@@ -51,6 +50,7 @@ void DarkSoul::build()
     sf::Sprite sprite;
     m_texture.setSmooth(true);
     sprite.setTexture(m_texture);
+
     // Set animation IDLE
     sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,0,SPRITE_WIDTH,SPRITE_HEIGHT));
     m_animationIDLE.push_back(sprite);
@@ -68,6 +68,7 @@ void DarkSoul::build()
     m_animationIDLE.push_back(sprite);
     sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*7,0,SPRITE_WIDTH,SPRITE_HEIGHT));
     m_animationIDLE.push_back(sprite);
+
     sf::Clock tickClock;
 	m_timeSinceLastUpdate = sf::Time::Zero;
 	m_TimePerFrame = sf::seconds(1.f / 60.f);

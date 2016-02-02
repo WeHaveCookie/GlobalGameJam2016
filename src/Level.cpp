@@ -3,36 +3,33 @@
 Level::Level(const std::string& path)
 :m_path(path), m_currentMap(0), Reader(path)
 {
-    //ctor
     read();
 }
 
 Level::~Level()
 {
-    //dtor
 }
-
-
 
 void Level::read()
 {
     int countPattern = 0;
     if(!m_tileset.loadFromFile(tilesetPath))
-    {
-        //RAISE A LOAD TEXTURE EXCEPTION
+    { //RAISE A LOAD TEXTURE EXCEPTION
     }
+
     while(m_curChar != EOF)
     {
         m_curWord = nextWord();
         loadPattern(m_curWord,++countPattern);
         skipSeparator();
     }
+
     buildLevel();
     generateRune();
 }
 
 void Level::loadPattern(const std::string& path, int pattern)
-{
+{ /** TODO : CHANGE THIS REALLY BAD STATEMENT !!!!!!!!**/
     std::string str;
     switch(pattern)
     {
@@ -62,24 +59,27 @@ void Level::buildLevel()
 {
     int* tabPattern = (int*) malloc(sizeof(int)*PATTERN_NBR);
     generatePattern(tabPattern,m_maps.size(),PATTERN_NBR);
-    //²m_levelCases = std::vector<Case>();
+
     m_levelCases.reserve(PATTERN_HEIGHT*PATTERN_WIDTH*PATTERN_NBR);
     for(int i(0);i<PATTERN_HEIGHT*PATTERN_WIDTH*PATTERN_NBR;i++)
     {
         m_levelCases.push_back(Case(sf::Sprite(),TileType::PASSING));
     }
+
     m_levelSize.x = PATTERN_WIDTH*PATTERN_NBR;
     m_levelSize.y = PATTERN_HEIGHT*PATTERN_NBR;
     m_levelVertices.setPrimitiveType(sf::Quads);
     m_levelVertices.resize(PATTERN_HEIGHT*PATTERN_WIDTH*PATTERN_NBR*4);
+
     for(int i=0;i<PATTERN_NBR;i++)
     {
-        //std::cout << "Get pattern " << tabPattern[i] << std::endl;
         sf::VertexArray patternVertice = m_maps[tabPattern[i]]->getVertices();
         std::vector<Case*> patternCase = m_maps[tabPattern[i]]->getCases();
+
         sf::Sprite ground = m_maps[tabPattern[i]]->getGround();
         ground.setPosition(i*PATTERN_WIDTH*SPRITE_WIDTH,0.0);
         m_backLevel.push_back(ground);
+
         for(int j=0;j<PATTERN_HEIGHT*PATTERN_WIDTH;j++)
         {
             sf::Vertex* patternQuad = &patternVertice[(j*4)];
@@ -103,6 +103,7 @@ void Level::buildLevel()
             quad[1].texCoords = patternQuad[1].texCoords;
             quad[2].texCoords = patternQuad[2].texCoords;
             quad[3].texCoords = patternQuad[3].texCoords;
+
             sf::Vector2f pos = patternCase[j]->getPosition();
             patternCase[j]->setPosition(pos+sf::Vector2f(i*PATTERN_WIDTH*SPRITE_WIDTH,0.0f));
             m_levelCases[(i * PATTERN_WIDTH + (j%PATTERN_WIDTH) + (floor(j/PATTERN_WIDTH)*m_levelSize.x))] = *patternCase[j];
@@ -112,7 +113,7 @@ void Level::buildLevel()
 
 void Level::generatePattern(int* tab, const int& nbrPattern, const int& nbrGen)
 {
-    // For lvl 1
+    // For start pattern
     tab[0] = 4;
     for(int i = 1; i < nbrGen; i++)
     {
@@ -133,18 +134,11 @@ void Level::drawMap(sf::RenderWindow* window, sf::View view)
 
         }
     }
-    //std::cout << "Display size : " << m_rune->size() << std::endl;
+
     for(int i(0);i<m_rune.size();i++)
     {
-        //std::cout << "i : " << i << std::endl;
         m_rune[i]->draw(window);
-        //std::cout << "Position rune x: " << m_rune[i]->getSprite().getPosition().x << " y: " << m_rune[i]->getSprite().getPosition().y << std::endl;
-        //std::cout << "Positon rune " << i << " x=" <<m_rune[i]->getRune()->getSprite().getPosition().x << " y=" << m_rune[i]->getRune()->getSprite().getPosition().y << std::endl;
     }
-    //std::string str;
-    //std::getline(std::cin,str);
-    //std::cout << "End" << std::endl;
-    //window->draw(*this);
 }
 
 void Level::generateRune()
@@ -156,20 +150,14 @@ void Level::generateRune()
         Case ca = getCaseAt(rb);
         if(ca.getType() == TileType::PASSING)
         {
-            std::cout << "Spawn rune at " << rb << " x=" << ca.getPosition().x << " y=" << ca.getPosition().y << std::endl;
             Rune* r = new Rune("Rune.png",rb);
             if(r->getSprite().getPosition().x > 1920)
             {
                 m_rune.push_back(r);
                 counterRune++;
             }
-            //r->setPosition(m_levelCases[rb]->getPosition());
-            //m_levelCases[rb]->setRune(r);
-            //std::cout << "Rune pos x:" << r->getSprite().getPosition().x << " y:" << r->getSprite().getPosition().y << std::endl;
-
         }
     }
-    std::cout << "Gene done " << std::endl;
 }
 
 bool Level::runeAt(int pos)
@@ -205,4 +193,3 @@ Rune* Level::getRuneAt(int pos)
         }
     }
 }
-

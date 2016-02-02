@@ -1,9 +1,7 @@
 #ifndef MAP_HPP
 #define MAP_HPP
-
 #include <SFML/Graphics.hpp>
-#include <iostream>   // std::cout
-#include <string>     // std::string, std::to_string
+
 #include "Reader.h"
 #include "Constante.hpp"
 #include "Case.hpp"
@@ -12,11 +10,15 @@ class Map : public Reader, public sf::Drawable, public sf::Transformable
 {
     public:
         Map(const std::string& path, std::string pattern);
+        virtual ~Map();
+
+        // Function
         void createMap();
         void read();
-        virtual ~Map();
+
+        // Inline
         inline std::vector<Case*> getCases(){return m_cases;}
-        virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
+        inline virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const
         {
             states.transform *= getTransform();
             states.texture = &m_tileset;
@@ -24,7 +26,6 @@ class Map : public Reader, public sf::Drawable, public sf::Transformable
         }
         inline sf::VertexArray getVertices() {return m_vertices;}
         inline const sf::Sprite getGround() {return m_ground;}
-        //inline sf::Sprite getWall() {return m_wall;}
 
     protected:
     private:
@@ -35,7 +36,5 @@ class Map : public Reader, public sf::Drawable, public sf::Transformable
         sf::Vector2i m_mapSize;
         sf::Vector2u m_spriteSize;
         sf::Sprite m_ground;
-        //sf::Sprite m_wall;
 };
-
 #endif // MAP_HPP

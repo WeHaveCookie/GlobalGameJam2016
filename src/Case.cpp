@@ -9,9 +9,7 @@ Case::Case(const sf::Sprite& sprite, const TileType& type)
 
 Case::~Case()
 {
-    //dtor
 }
-
 
 void Case::draw(sf::RenderWindow* window)
 {

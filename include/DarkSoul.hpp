@@ -7,17 +7,24 @@ class DarkSoul : public DrawableObject
 {
     public:
         DarkSoul(std::string path, int pos);
+        virtual ~DarkSoul();
+
+        // Function
         void draw(sf::RenderWindow* window);
         void update(sf::RenderWindow* window);
         void move(sf::Vector2f motion);
         void updateAnimation();
         void addSoul();
 
+        // Inline
         inline sf::Sprite getSprite() {return m_sprite;}
-        virtual ~DarkSoul();
+
     protected:
     private:
+        // Function
         void build();
+
+        // Attribut
         sf::Texture m_texture;
         sf::Sprite m_sprite;
         sf::Vector2f m_position;

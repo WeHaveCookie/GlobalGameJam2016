@@ -19,8 +19,6 @@ void Reader::open(const std::string & filePath)
         std::cerr<<"READER : Error load file " << m_filePath << std::endl;
     }
 
-    // FOR JAM
-    //std::cout << "Skip : " << m_curChar << std::endl;
     nextChar();
 }
 
@@ -28,7 +26,9 @@ bool Reader::endFile()
 {
     bool isEnd = m_file.peek()==EOF;
     if (m_file.eof())
+    {
         m_file.clear();
+    }
     return isEnd;
 }
 
@@ -76,4 +76,3 @@ void Reader::skipSeparator()
            m_curChar == ':')
             nextChar();
 }
-
