@@ -5,35 +5,7 @@ Controller::Controller(sf::RenderWindow* window)
     m_engine = new Engine();
     m_window = window;
     m_menu = new Menu();
-    m_displayMenu = false;
-    m_victory = false;
-    m_viewSpeed = DEFAULT_SPEED;
-    m_darksoulsSpeed = DEFAULT_SPEED;
-    m_speedPlayer = DEFAULT_SPEED;
-    m_pitch = 1;
 
-    // Setting view
-    m_viewGame.reset(sf::FloatRect(0, 0, 1920, 960));
-    m_viewHUD.reset(sf::FloatRect(0,960,1920,120));
-    m_viewMenu.reset(sf::FloatRect(0,0,1920,1080));
-    m_viewGame.setViewport(sf::FloatRect(0,0,1,960.0f/1080.0f));
-    m_viewHUD.setViewport(sf::FloatRect(0,960.0f/1080.0f,1,120.0f/1080.f));
-
-    // Load level
-    m_level = new Level(levelPath+"level.lvl");
-    m_player = new Character("tileset.png",this);
-
-    // Load Darksouls
-    for(int i(0);i<16;i++)
-    {
-        m_darksouls.push_back(new DarkSoul("darksoul.png", (i)*(PATTERN_WIDTH*PATTERN_NBR)));
-    }
-
-    // Set engine
-    m_engine->setMap(m_level);
-
-    // Load Music
-    m_transitionMusic = false;
     if (!m_mainThemeMusic.openFromFile(soundPath+"MainTheme.ogg"))
     { //RAISE ERROR
     }
@@ -54,15 +26,7 @@ Controller::Controller(sf::RenderWindow* window)
     { //RAISE ERROR
     }
 
-    // Load rune HUD
-    sf::Sprite sprite;
-    sprite.setTexture(m_runeTexture);
-    for(int i(0);i<5;i++)
-    {
-        sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
-        sprite.setPosition(sf::Vector2f(sf::Vector2f(20.0f+(i*(SPRITE_WIDTH+10)),980.0f)));
-        m_runeHUD.push_back(sprite);
-    }
+    init();
 }
 
 Controller::~Controller()
@@ -70,21 +34,19 @@ Controller::~Controller()
     delete m_window;
     delete m_player;
     delete m_menu;
-    delete m_level;
     delete m_engine;
+    delete m_level;
 }
 
 int Controller::start()
 {
-
-    bool move = false;
-	int turbo = 1;
 	sf::Vector2f speed = sf::Vector2f(0.f,0.f);
+    bool endDeadPlayer = false;
+    bool endEndMenu = false;
 
 	sf::Clock tickClock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
 	sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
-	sf::Time duration = sf::Time::Zero;
 
     // Setting Music
     m_mainThemeMusic.setVolume(100);
@@ -137,12 +99,6 @@ int Controller::start()
                 default :
                     break;
             }
-            if (event.type == sf::Event::JoystickMoved){
-				move = true;
-            }
-            else{
-                move = false;
-            }
         }
 
         // Update Music
@@ -154,15 +110,41 @@ int Controller::start()
             m_victory = true;
         }
 
+        // Catch keyboard event
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            m_engine->move(m_player,sf::Vector2f(-1.0,0.0));
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            m_engine->move(m_player,sf::Vector2f(1.0,0.0));
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {
+            m_engine->move(m_player,sf::Vector2f(0.0,-1.0));
+        }
+
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+            m_engine->move(m_player,sf::Vector2f(0.0,1.0));
+        }
+
         // Catch gamepad event
-        if (sf::Joystick::isButtonPressed(0, 0))
+        if (sf::Joystick::isButtonPressed(0, 0) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
         {// A button
             m_player->setSpeed(m_speedPlayer*2.0f);
         }
 
-        if(sf::Joystick::isButtonPressed(0,7))
+        if (!sf::Joystick::isButtonPressed(0, 0) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        {
+            m_player->setSpeed(m_speedPlayer);
+        }
+
+        if(sf::Joystick::isButtonPressed(0,7) || sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
         { // Start button
-            if(m_displayMenu=true)
+            if(m_displayMenu==true)
             {
                 m_creditsMusic.stop();
                 m_pickupRuneSound.play();
@@ -173,7 +155,7 @@ int Controller::start()
 
         if(sf::Joystick::isButtonPressed(0,3))
         { // Y button
-            if(m_displayMenu=true)
+            if(m_displayMenu==true)
             {
                 m_creditsMusic.stop();
                 m_menuMusic.play();
@@ -183,7 +165,7 @@ int Controller::start()
 
         if(sf::Joystick::isButtonPressed(0,2))
         { // X button
-            if(m_displayMenu=true)
+            if(m_displayMenu==true)
             {
                 m_menuMusic.stop();
                 m_creditsMusic.play();
@@ -192,10 +174,7 @@ int Controller::start()
             //m_displayMenu=false;
         }
 
-        if (!sf::Joystick::isButtonPressed(0, 0))
-        {
-            m_player->setSpeed(m_speedPlayer);
-        }
+
 
         if(sf::Joystick::isButtonPressed(0,1))
         {// B button
@@ -214,13 +193,50 @@ int Controller::start()
             }
         } else if (!m_player->isAlive())
         { // Display dead
-            if(!m_menu->isEnable())
+            //std::cout << "endand : " << m_player->endAnimateDead() << std::endl;
+            if (!m_player->endAnimateDead() && !endDeadPlayer)
             {
-                //Restart
+                std::cout << "Animate dead" << std::endl;
+                // Draw on view Game
+                m_window->setView(m_viewGame);
+                m_level->drawMap(m_window,m_viewGame);
+                m_player->draw(m_window);
+                displayDarkSouls();
+
+                // Draw on view HUD
+                m_window->setView(m_viewHUD);
+                displayRune();
+                if(m_player->endAnimateDead())
+                {
+                    std::cout << "Set menuState End" << std::endl;
+                    endDeadPlayer = true;
+                    m_menu->setState(MenuState::END);
+                }
+            } else if(m_menu->getState() == MenuState::END && endDeadPlayer)
+            {
+                std::cout << "Display end menu" << std::endl;
+                m_window->setView(m_viewMenu);
+                m_menu->draw(m_window);
+                if(m_menu->getState() != MenuState::END)
+                {
+                    endEndMenu = true;
+                }
+            } else if(endEndMenu && endDeadPlayer)
+            {
+                std:: cout << "init" << std::endl;
+                init();
+                speed = sf::Vector2f(0.f,0.f);
+
+                timeSinceLastUpdate = sf::Time::Zero;
+                TimePerFrame = sf::seconds(1.f / 60.f);
+
+                endDeadPlayer = false;
+                endEndMenu = false;
+                // Setting Menu
+                m_displayMenu = true;
+                m_menu->setEnable(true);
 
             }
-            m_window->setView(m_viewMenu);
-            m_menu->draw(m_window);
         } else
         { // Display game
             if(!m_victory)
@@ -238,7 +254,7 @@ int Controller::start()
                     //A 15% DEAD ZONE SEEMS TO WORK FOR ME - GIVE THAT A SHOT
                     if (speed.x > 60.f || speed.x < -60.f || speed.y > 60.f || speed.y < -60.f)
                     {
-                        m_engine->move(m_player,sf::Vector2f(turbo*speed.x*TimePerFrame.asSeconds(), turbo*speed.y*TimePerFrame.asSeconds()));
+                        m_engine->move(m_player,sf::Vector2f(speed.x*TimePerFrame.asSeconds(), speed.y*TimePerFrame.asSeconds()));
                     }
                 }
 
@@ -274,6 +290,54 @@ int Controller::start()
     return 0;
 }
 
+void Controller::init()
+{
+    m_displayMenu = false;
+    m_victory = false;
+    m_viewSpeed = DEFAULT_SPEED;
+    m_darksoulsSpeed = DEFAULT_SPEED;
+    m_speedPlayer = DEFAULT_SPEED;
+    m_pitch = 1;
+
+    // Load level
+    //delete m_player;
+    //delete m_level;
+    m_level = new Level(levelPath+"level.lvl");
+    m_player = new Character("tileset.png",this);
+
+
+    // Setting view
+    m_viewGame.reset(sf::FloatRect(0, 0, 1920, 960));
+    m_viewHUD.reset(sf::FloatRect(0,960,1920,120));
+    m_viewMenu.reset(sf::FloatRect(0,0,1920,1080));
+    m_viewGame.setViewport(sf::FloatRect(0,0,1,960.0f/1080.0f));
+    m_viewHUD.setViewport(sf::FloatRect(0,960.0f/1080.0f,1,120.0f/1080.f));
+
+    m_darksouls.clear();
+    // Load Darksouls
+    for(int i(0);i<16;i++)
+    {
+        m_darksouls.push_back(new DarkSoul("darksoul.png", (i)*(PATTERN_WIDTH*PATTERN_NBR)));
+    }
+
+    // Set engine
+    m_engine->setMap(m_level);
+
+    // Load Music
+    m_transitionMusic = false;
+
+    // Load rune HUD
+    m_runeHUD.clear();
+    sf::Sprite sprite;
+    sprite.setTexture(m_runeTexture);
+    for(int i(0);i<5;i++)
+    {
+        sprite.setTextureRect(sf::IntRect(SPRITE_WIDTH*0,SPRITE_HEIGHT*2,SPRITE_WIDTH,SPRITE_HEIGHT));
+        sprite.setPosition(sf::Vector2f(sf::Vector2f(20.0f+(i*(SPRITE_WIDTH+10)),980.0f)));
+        m_runeHUD.push_back(sprite);
+    }
+}
+
 void Controller::growSpeed()
 {
     float motion;
@@ -299,20 +363,20 @@ void Controller::setLevel(std::string path)
 
 void Controller::moveSouls(sf::Vector2f motion)
 {
-    for(int i(0); i<m_darksouls.size();i++)
+    for(int i(0); i<(int)m_darksouls.size();i++)
     {
         m_engine->move(m_darksouls[i],motion,false);
         if (m_engine->collisionAABB(m_darksouls[i]->getSprite().getGlobalBounds(),m_player->getSprite().getGlobalBounds()))
         {
-            m_menu->setState(MenuState::END);
             m_player->setAlive(false);
+            //m_menu->setState(MenuState::END);
         }
     }
 }
 
 void Controller::displayDarkSouls()
 {
-    for(int i(0); i<m_darksouls.size();i++)
+    for(int i(0); i<(int)m_darksouls.size();i++)
     {
         m_darksouls[i]->draw(m_window);
     }
@@ -320,11 +384,11 @@ void Controller::displayDarkSouls()
 
 void Controller::displayRune()
 {
-    for(int i(0); i<m_runeHUD.size();i++)
+    for(int i(0); i<(int)m_runeHUD.size();i++)
     {
         m_window->draw(m_runeHUD[i]);
     }
-    for(int i(0); i<m_runes.size();i++)
+    for(int i(0); i<(int)m_runes.size();i++)
     {
         if(m_runes[i]->getState() != RuneState::TAKEN)
         {

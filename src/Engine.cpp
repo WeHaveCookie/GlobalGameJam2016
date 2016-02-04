@@ -11,7 +11,6 @@ Engine::Engine()
 
 Engine::~Engine()
 {
-    delete m_level;
 }
 
 bool Engine::collisionCircle(sf::FloatRect box1, sf::CircleShape circle)

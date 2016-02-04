@@ -20,6 +20,7 @@ class Menu
         inline void setState(MenuState st) {m_menuState = st;}
         inline void onAnimation() {m_onAnimation = true;}
         inline bool isAnimated() {return m_onAnimation;}
+        inline MenuState getState() {return m_menuState;}
 
     protected:
     private:

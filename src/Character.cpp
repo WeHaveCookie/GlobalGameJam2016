@@ -56,7 +56,7 @@ void Character::update(sf::RenderWindow* window)
     {
         if(!m_endAnimationDead)
         {
-            if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
+            if(m_timeSinceLastUpdate > (m_duration*m_speed) + m_TimePerFrame)
             {
                 updateAnimation();
             } else {
@@ -139,6 +139,7 @@ void Character::updatePosition()
                 break;
         }
         m_animationCounter = 0;
+        /** TODO CHANGE THIS FOR BETTER ANIMATION**/
         m_movingState = MovingState::IDLE;
         m_onMove = false;
         m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
@@ -309,4 +310,19 @@ void Character::updateAnimation()
         default:
             break;
     }
+}
+
+void Character::setAlive(bool b)
+{
+    m_alive = b;
+    if(!m_alive)
+    {
+        m_movingState = MovingState::DEAD;
+        m_animationCounter = 0;
+    } else
+    {
+        m_endAnimationDead = false;
+        m_movingState = MovingState::IDLE;
+    }
+
 }

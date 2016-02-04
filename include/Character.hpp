@@ -19,13 +19,16 @@ public:
     void update(sf::RenderWindow* window);
     void move(sf::Vector2f motion);
     void updateAnimation();
+    void setAlive(bool b);
 
     // Inline
     inline sf::Sprite getSprite() {return m_sprite;}
-    inline void setAlive(bool b) {m_alive = b; m_movingState = MovingState::DEAD; m_animationCounter = 0;}
-    inline void setSpeed(float f) {m_speed = f;}
+    inline void setSpeed(float f) {m_speed = f; m_duration = sf::seconds(0.1/m_speed);}
     inline float getSpeed() {return m_speed;}
     inline bool isAlive() {return m_alive;}
+    inline bool endAnimateDead() {return m_endAnimationDead;}
+    inline void setEndAnimateDead(bool b) {m_endAnimationDead = b;}
+    inline MovingState getState() {return m_movingState;}
 
 protected:
 private:
