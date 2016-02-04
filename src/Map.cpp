@@ -1,4 +1,4 @@
-#include "Map.hpp"
+#include "../include/Map.hpp"
 
 Map::Map(const std::string& path, std::string pattern)
 :m_path(path), Reader(path)

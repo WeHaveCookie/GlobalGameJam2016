@@ -1,4 +1,4 @@
-#include "Rune.hpp"
+#include "../include/Rune.hpp"
 
 Rune::Rune(std::string path, int pos)
 {
@@ -135,7 +135,7 @@ void Rune::build()
     sf::Clock tickClock;
 	m_timeSinceLastUpdate = sf::Time::Zero;
 	m_TimePerFrame = sf::seconds(1.f / 60.f);
-	m_duration = sf::seconds(0.2);
+	m_duration = sf::seconds(0.1);
 }
 
 void Rune::taken(int pos)

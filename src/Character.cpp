@@ -36,6 +36,10 @@ void Character::draw(sf::RenderWindow* window)
 {
     update(window);
     window->draw(m_sprite);
+    if(m_animationCounter == 0 && m_alive)
+    {
+        m_movingState = MovingState::IDLE;
+    }
 }
 
 void Character::update(sf::RenderWindow* window)
@@ -49,7 +53,8 @@ void Character::update(sf::RenderWindow* window)
         if(m_timeSinceLastUpdate > m_duration + m_TimePerFrame)
         {
             updateAnimation();
-        } else {
+        } else
+        {
             m_timeSinceLastUpdate += m_TimePerFrame;
         }
     } else
@@ -59,7 +64,8 @@ void Character::update(sf::RenderWindow* window)
             if(m_timeSinceLastUpdate > (m_duration*m_speed) + m_TimePerFrame)
             {
                 updateAnimation();
-            } else {
+            } else
+            {
                 m_timeSinceLastUpdate += m_TimePerFrame;
             }
         }
@@ -140,7 +146,7 @@ void Character::updatePosition()
         }
         m_animationCounter = 0;
         /** TODO CHANGE THIS FOR BETTER ANIMATION**/
-        m_movingState = MovingState::IDLE;
+        //m_movingState = MovingState::IDLE;
         m_onMove = false;
         m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
         m_controller->getRune(m_positionInWorld);

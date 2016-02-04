@@ -1,4 +1,4 @@
-#include "Level.hpp"
+#include "../include/Level.hpp"
 
 Level::Level(const std::string& path)
 :m_path(path), m_currentMap(0), Reader(path)

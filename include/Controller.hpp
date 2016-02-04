@@ -60,6 +60,7 @@ class Controller
         sf::Music m_mainThemeMusic;
         sf::Music m_menuMusic;
         sf::Music m_creditsMusic;
+        sf::Music m_endMusic;
 
         std::vector<Rune*> m_runes;
         bool m_victory;
@@ -74,7 +75,8 @@ class Controller
         float m_viewSpeed;
         float m_darksoulsSpeed;
         float m_speedPlayer;
-        float m_pitch;
+        float m_pitchMainTheme;
+        float m_pitchEnd;
 };
 
 #endif // CONTROLLER_HPP

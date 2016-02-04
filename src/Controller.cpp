@@ -26,6 +26,10 @@ Controller::Controller(sf::RenderWindow* window)
     { //RAISE ERROR
     }
 
+    if(!m_endMusic.openFromFile(soundPath + "SoulSparkEnd.ogg"))
+    { //RAISE ERROR
+    }
+
     init();
 }
 
@@ -48,14 +52,19 @@ int Controller::start()
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
 	sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
 
+	sf::Time timeSinceLastUpdateEvent = sf::Time::Zero;
+	sf::Time TimePerFrameEvent = sf::seconds(1.f / 60.f);
+	sf::Time durationEvent = sf::seconds(1);
+
     // Setting Music
-    m_mainThemeMusic.setVolume(100);
+    m_mainThemeMusic.setVolume(80);
     m_mainThemeMusic.setLoop(true);
-    m_menuMusic.setVolume(100);
+    m_menuMusic.setVolume(80);
     m_menuMusic.setLoop(true);
-    m_creditsMusic.setVolume(100);
+    m_creditsMusic.setVolume(80);
     m_creditsMusic.setLoop(true);
     m_pickupRuneSound.setVolume(100);
+    m_endMusic.setVolume(80);
 
     // Setting Menu
     m_displayMenu = true;
@@ -142,39 +151,42 @@ int Controller::start()
             m_player->setSpeed(m_speedPlayer);
         }
 
-        if(sf::Joystick::isButtonPressed(0,7) || sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-        { // Start button
-            if(m_displayMenu==true)
-            {
-                m_creditsMusic.stop();
-                m_pickupRuneSound.play();
-                m_menu->setState(MenuState::TITLE);
-                m_transitionMusic = true;
+        if(timeSinceLastUpdateEvent > durationEvent + TimePerFrameEvent)
+        {
+            if(sf::Joystick::isButtonPressed(0,7) || sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+            { // Start button
+                if(m_displayMenu==true)
+                { // Start game
+                    m_creditsMusic.stop();
+                    m_pickupRuneSound.play();
+                    m_menu->setState(MenuState::TITLE);
+                    m_transitionMusic = true;
+                } else
+                { // Pause Game
+
+                }
             }
-        }
 
-        if(sf::Joystick::isButtonPressed(0,3))
-        { // Y button
-            if(m_displayMenu==true)
-            {
-                m_creditsMusic.stop();
-                m_menuMusic.play();
-                m_menu->setState(MenuState::NOTHING);
+            if(sf::Joystick::isButtonPressed(0,2))
+            { // X button
+                timeSinceLastUpdateEvent = sf::Time::Zero;
+                if(m_displayMenu==true)
+                {
+                    if(m_menu->getState() == MenuState::CREDIT)
+                    {
+                        m_creditsMusic.stop();
+                        m_menu->setState(MenuState::NOTHING);
+                    } else
+                    {
+                        m_menuMusic.stop();
+                        m_menu->setState(MenuState::CREDIT);
+                    }
+                }
             }
+        } else
+        {
+            timeSinceLastUpdateEvent += TimePerFrameEvent;
         }
-
-        if(sf::Joystick::isButtonPressed(0,2))
-        { // X button
-            if(m_displayMenu==true)
-            {
-                m_menuMusic.stop();
-                m_creditsMusic.play();
-                m_menu->setState(MenuState::CREDIT);
-            }
-            //m_displayMenu=false;
-        }
-
-
 
         if(sf::Joystick::isButtonPressed(0,1))
         {// B button
@@ -193,10 +205,8 @@ int Controller::start()
             }
         } else if (!m_player->isAlive())
         { // Display dead
-            //std::cout << "endand : " << m_player->endAnimateDead() << std::endl;
             if (!m_player->endAnimateDead() && !endDeadPlayer)
             {
-                std::cout << "Animate dead" << std::endl;
                 // Draw on view Game
                 m_window->setView(m_viewGame);
                 m_level->drawMap(m_window,m_viewGame);
@@ -208,22 +218,20 @@ int Controller::start()
                 displayRune();
                 if(m_player->endAnimateDead())
                 {
-                    std::cout << "Set menuState End" << std::endl;
                     endDeadPlayer = true;
                     m_menu->setState(MenuState::END);
                 }
             } else if(m_menu->getState() == MenuState::END && endDeadPlayer)
             {
-                std::cout << "Display end menu" << std::endl;
                 m_window->setView(m_viewMenu);
                 m_menu->draw(m_window);
                 if(m_menu->getState() != MenuState::END)
                 {
                     endEndMenu = true;
                 }
+
             } else if(endEndMenu && endDeadPlayer)
             {
-                std:: cout << "init" << std::endl;
                 init();
                 speed = sf::Vector2f(0.f,0.f);
 
@@ -237,6 +245,7 @@ int Controller::start()
                 m_menu->setEnable(true);
 
             }
+            m_pitchEnd -= 0.01;
         } else
         { // Display game
             if(!m_victory)
@@ -297,8 +306,8 @@ void Controller::init()
     m_viewSpeed = DEFAULT_SPEED;
     m_darksoulsSpeed = DEFAULT_SPEED;
     m_speedPlayer = DEFAULT_SPEED;
-    m_pitch = 1;
-
+    m_pitchMainTheme = 1;
+    m_pitchEnd = 1;
     // Load level
     //delete m_player;
     //delete m_level;
@@ -348,7 +357,7 @@ void Controller::growSpeed()
 
     if(rb < 10)
     {
-        m_pitch += pitch;
+        m_pitchMainTheme += pitch;
         m_viewSpeed+=motion;
         m_darksoulsSpeed+=motion;
         m_speedPlayer+=motion;
@@ -417,17 +426,33 @@ void Controller::updateMusic()
     {
         if(m_displayMenu)
         {
-            if(m_menuMusic.getStatus() != sf::SoundSource::Status::Playing)
-            {////////
+            if(m_menuMusic.getStatus() != sf::SoundSource::Status::Playing && m_menu->getState() == MenuState::NOTHING)
+            {
                 m_menuMusic.play();
+            } else if (m_creditsMusic.getStatus() != sf::SoundSource::Status::Playing && m_menu->getState() == MenuState::CREDIT)
+            {
+                m_creditsMusic.play();
             }
         } else
         {
-            if(m_mainThemeMusic.getStatus() != sf::SoundSource::Status::Playing)
+            if(m_player->isAlive())
             {
-                m_mainThemeMusic.play();
+                m_endMusic.stop();
+                if(m_mainThemeMusic.getStatus() != sf::SoundSource::Status::Playing)
+                {
+                    m_mainThemeMusic.play();
+                }
+                m_mainThemeMusic.setPitch(m_pitchMainTheme);
+            } else
+            {
+                m_mainThemeMusic.stop();
+                if(m_endMusic.getStatus() != sf::SoundSource::Status::Playing)
+                {
+                    m_endMusic.play();
+                }
+                m_endMusic.setPitch(m_pitchEnd);
             }
-            m_mainThemeMusic.setPitch(m_pitch);
+
         }
     }
 }

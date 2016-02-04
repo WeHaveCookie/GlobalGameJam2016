@@ -1,4 +1,4 @@
-#include "Case.hpp"
+#include "../include/Case.hpp"
 
 Case::Case(const sf::Sprite& sprite, const TileType& type)
 {
