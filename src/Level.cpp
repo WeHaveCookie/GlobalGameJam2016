@@ -1,8 +1,9 @@
 #include "../include/Level.hpp"
 
 Level::Level(const std::string& path)
-:m_path(path), m_currentMap(0), Reader(path)
+: Reader(path)
 {
+    m_path = path;
     read();
 }
 
@@ -29,29 +30,8 @@ void Level::read()
 }
 
 void Level::loadPattern(const std::string& path, int pattern)
-{ /** TODO : CHANGE THIS REALLY BAD STATEMENT !!!!!!!!**/
-    std::string str;
-    switch(pattern)
-    {
-        case 1:
-            str = "1";
-            break;
-        case 2:
-            str = "2";
-            break;
-        case 3:
-            str = "3";
-            break;
-        case 4:
-            str = "4";
-            break;
-        case 5:
-            str = "5";
-            break;
-        default:
-            break;
-    }
-    Map* nMap = new Map(path,str);
+{
+    Map* nMap = new Map(path,std::to_string(pattern));
     m_maps.push_back(nMap);
 }
 
@@ -128,14 +108,14 @@ void Level::drawMap(sf::RenderWindow* window, sf::View view)
     int state = floor((widthView-1)/(PATTERN_WIDTH*SPRITE_WIDTH));
     for(int i(state);i<state+2;i++)
     {
-        if(i < m_backLevel.size())
+        if(i < (int)m_backLevel.size())
         {
             window->draw(m_backLevel.at(i));
 
         }
     }
 
-    for(int i(0);i<m_rune.size();i++)
+    for(int i(0);i<(int)m_rune.size();i++)
     {
         m_rune[i]->draw(window);
     }
@@ -162,7 +142,7 @@ void Level::generateRune()
 
 bool Level::runeAt(int pos)
 {
-    for(int i(0);i<m_rune.size();i++)
+    for(int i(0);i<(int)m_rune.size();i++)
     {
         if(m_rune[i]->getPositionInWorld() == pos)
         {
@@ -174,7 +154,7 @@ bool Level::runeAt(int pos)
 
 void Level::disableRuneAt(int pos)
 {
-    for(int i(0);i<m_rune.size();i++)
+    for(int i(0);i<(int)m_rune.size();i++)
     {
         if(m_rune[i]->getPositionInWorld() == pos)
         {
@@ -185,11 +165,12 @@ void Level::disableRuneAt(int pos)
 
 Rune* Level::getRuneAt(int pos)
 {
-    for(int i(0);i<m_rune.size();i++)
+    for(int i(0);i<(int)m_rune.size();i++)
     {
         if(m_rune[i]->getPositionInWorld() == pos)
         {
             return m_rune[i];
         }
     }
+    return NULL;
 }

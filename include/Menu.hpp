@@ -1,5 +1,6 @@
 #ifndef MENU_HPP
 #define MENU_HPP
+#include <string>
 #include "Structure.hpp"
 #include "Constante.hpp"
 
@@ -28,7 +29,6 @@ class Menu
         void build();
 
         // Attribut
-        std::string toString(int i);
         sf::Texture m_texture;
         sf::Sprite m_sprite;
         std::vector<sf::Sprite> m_animationTITLE;

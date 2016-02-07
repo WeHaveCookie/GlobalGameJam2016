@@ -145,8 +145,6 @@ void Character::updatePosition()
                 break;
         }
         m_animationCounter = 0;
-        /** TODO CHANGE THIS FOR BETTER ANIMATION**/
-        //m_movingState = MovingState::IDLE;
         m_onMove = false;
         m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
         m_controller->getRune(m_positionInWorld);

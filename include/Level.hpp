@@ -43,7 +43,6 @@ class Level : public Reader, public sf::Drawable, public sf::Transformable
         std::vector<sf::Sprite> m_backLevel;
         sf::Texture m_tileset;
         sf::Vector2i m_levelSize;
-        int m_currentMap;
         sf::VertexArray m_levelVertices;
         std::vector<Rune*> m_rune;
 };
