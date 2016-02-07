@@ -10,6 +10,7 @@
 #include "Menu.hpp"
 #include "Structure.hpp"
 #include "Level.hpp"
+#include "Sprint.hpp"
 
 class Character;
 class Engine;
@@ -42,13 +43,19 @@ class Controller
         void updateMusic();
         void reload();
         void init();
+        void drawViewGame();
+        void drawViewHUD();
+        void drawViewMenu();
+
 
         // Attribut
         sf::RenderWindow* m_window;
         Character* m_player;
         std::vector<DarkSoul*> m_darksouls;
         Menu* m_menu;
+        Sprint* m_sprint;
         bool m_displayMenu;
+        bool m_displayPause;
         sf::View m_viewGame;
         sf::View m_viewHUD;
         sf::View m_viewMenu;
@@ -64,8 +71,8 @@ class Controller
 
         std::vector<Rune*> m_runes;
         bool m_victory;
-        sf::Sprite m_filterMenu;
-        sf::Texture m_textureFilterMenu;
+        sf::Sprite m_filterPause;
+        sf::Texture m_textureFilterPause;
         std::vector<sf::Sprite> m_runeHUD;
         sf::Texture m_runeTexture;
         bool m_transitionMusic;
@@ -77,6 +84,7 @@ class Controller
         float m_speedPlayer;
         float m_pitchMainTheme;
         float m_pitchEnd;
+        float m_exhaust;
 };
 
 #endif // CONTROLLER_HPP
