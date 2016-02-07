@@ -1,8 +1,9 @@
 #include "../include/Map.hpp"
 
 Map::Map(const std::string& path, std::string pattern)
-:m_path(path), Reader(path)
+: Reader(path)
 {
+    m_path = path;
     m_mapSize.x = PATTERN_WIDTH;
     m_mapSize.y = PATTERN_HEIGHT;
     m_spriteSize = sf::Vector2u(SPRITE_WIDTH,SPRITE_HEIGHT);

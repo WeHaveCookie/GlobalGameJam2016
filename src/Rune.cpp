@@ -58,14 +58,14 @@ void Rune::updateAnimation()
     {
         case RuneState::IDLEGAME:
             m_sprite.setTextureRect(m_animationIDLEGAME[m_animationCounter].getTextureRect());
-            if(++m_animationCounter >= m_animationIDLEGAME.size())
+            if(++m_animationCounter >= (int)m_animationIDLEGAME.size())
             {
                 m_animationCounter = 0;
             }
             break;
         case RuneState::TAKEN:
             m_sprite.setTextureRect(m_animationTAKEN[m_animationCounter].getTextureRect());
-            if(++m_animationCounter >= m_animationTAKEN.size())
+            if(++m_animationCounter >= (int)m_animationTAKEN.size())
             {
                 m_animationCounter = 0;
                 m_state = RuneState::DROP;
@@ -74,7 +74,7 @@ void Rune::updateAnimation()
             break;
         case RuneState::DROP:
             m_sprite.setTextureRect(m_animationDROP[m_animationCounter].getTextureRect());
-            if(++m_animationCounter >= m_animationDROP.size())
+            if(++m_animationCounter >= (int)m_animationDROP.size())
             {
                 m_animationCounter = 0;
                 m_state = RuneState::IDLEHUD;

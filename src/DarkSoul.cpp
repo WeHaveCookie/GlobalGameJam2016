@@ -79,7 +79,7 @@ void DarkSoul::updateAnimation()
 {
     m_timeSinceLastUpdate = sf::Time::Zero;
     m_sprite.setTextureRect(m_animationIDLE[m_animationCounter].getTextureRect());
-    if(++m_animationCounter >= m_animationIDLE.size())
+    if(++m_animationCounter >= (int)m_animationIDLE.size())
     {
         m_animationCounter = 0;
     }
