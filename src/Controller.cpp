@@ -129,41 +129,45 @@ int Controller::start()
             }
         }
 
-        // Catch keyboard event
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        {
-            m_engine->move(m_player,sf::Vector2f(-1.0,0.0));
-        }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        if(!m_displayPause)
         {
-            m_engine->move(m_player,sf::Vector2f(1.0,0.0));
-        }
-
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        {
-            m_engine->move(m_player,sf::Vector2f(0.0,-1.0));
-        }
-
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        {
-            m_engine->move(m_player,sf::Vector2f(0.0,1.0));
-        }
-
-        // Catch gamepad event
-        if (sf::Joystick::isButtonPressed(0, 0) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        {// A button
-            if(m_sprint->sprintAvailable())
+            // Catch keyboard event
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
             {
-                m_player->setSpeed(m_speedPlayer*1.5f);
-                m_sprint->increase();
+                m_engine->move(m_player,sf::Vector2f(-1.0,0.0));
             }
 
-        }
-        if (!sf::Joystick::isButtonPressed(0, 0) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        {
-            m_player->setSpeed(m_speedPlayer);
-            m_sprint->decrease();
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            {
+                m_engine->move(m_player,sf::Vector2f(1.0,0.0));
+            }
+
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            {
+                m_engine->move(m_player,sf::Vector2f(0.0,-1.0));
+            }
+
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            {
+                m_engine->move(m_player,sf::Vector2f(0.0,1.0));
+            }
+
+            // Catch gamepad event
+            if (sf::Joystick::isButtonPressed(0, 0) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            {// A button
+                if(m_sprint->sprintAvailable())
+                {
+                    m_player->setSpeed(m_speedPlayer*1.5f);
+                    m_sprint->increase();
+                }
+
+            }
+            if (!sf::Joystick::isButtonPressed(0, 0) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            {
+                m_player->setSpeed(m_speedPlayer);
+                m_sprint->decrease();
+            }
         }
 
          if(!sf::Joystick::isButtonPressed(0,7) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
@@ -249,8 +253,6 @@ int Controller::start()
             reload = false;
         } else if(m_displayMenu && m_player->isAlive())
         { // Display Menu
-            /*m_window->setView(m_viewMenu);
-            m_menu->draw(m_window);*/
             drawViewMenu();
             if(!m_menu->isEnable())
             {
@@ -260,8 +262,6 @@ int Controller::start()
         { // Display Victory
             if(m_menu->getState() == MenuState::END)
             {
-                /*m_window->setView(m_viewMenu);
-                m_menu->draw(m_window);*/
                 drawViewMenu();
             } else
             {
@@ -270,15 +270,7 @@ int Controller::start()
 
         } else if (m_displayPause && m_player->isAlive())
         { // Display Pause
-            /*m_window->setView(m_viewGame);
-            m_level->drawMap(m_window,m_viewGame);
-            m_player->draw(m_window);
-            displayDarkSouls();*/
             drawViewGame();
-
-            // Draw on view HUD
-            /*m_window->setView(m_viewHUD);
-            displayRune();*/
             drawViewHUD();
 
             m_window->setView(m_viewMenu);
@@ -288,16 +280,7 @@ int Controller::start()
         { // Display Dead
             if (!m_player->endAnimateDead())
             {
-                // Draw on view Game
-                /*m_window->setView(m_viewGame);
-                m_level->drawMap(m_window,m_viewGame);
-                m_player->draw(m_window);
-                displayDarkSouls();*/
                 drawViewGame();
-
-                // Draw on view HUD
-                /*m_window->setView(m_viewHUD);
-                displayRune();*/
                 drawViewHUD();
             } else
             {
@@ -317,7 +300,7 @@ int Controller::start()
 
                     // Update the position of the square according to input from joystick
                     // 60% dead zone
-                    if (speed.x > 60.f || speed.x < -60.f || speed.y > 60.f || speed.y < -60.f)
+                    if ((speed.x > 60.f || speed.x < -60.f || speed.y > 60.f || speed.y < -60.f) && !m_displayPause)
                     {
                         m_engine->move(m_player,sf::Vector2f(speed.x*TimePerFrame.asSeconds(), speed.y*TimePerFrame.asSeconds()));
                     }
@@ -334,16 +317,7 @@ int Controller::start()
                 moveSouls(sf::Vector2f(m_darksoulsSpeed,0.0));
             }
 
-            // Draw on view Game
-            /*m_window->setView(m_viewGame);
-            m_level->drawMap(m_window,m_viewGame);
-            m_player->draw(m_window);
-            displayDarkSouls();*/
             drawViewGame();
-
-            // Draw on view HUD
-            /*m_window->setView(m_viewHUD);
-            displayRune();*/
             drawViewHUD();
 
             // Grow up speed of game
@@ -498,7 +472,6 @@ void Controller::updateMusic()
             }
         } else if (m_displayPause)
         {
-            //std::cout << "On update music pause " << std::endl;
             m_mainThemeMusic.stop();
             if(m_menuMusic.getStatus() != sf::SoundSource::Status::Playing)
             {
@@ -510,7 +483,6 @@ void Controller::updateMusic()
             if(m_player->isAlive())
             {
                 m_endMusic.stop();
-                //m_menuMusic.stop();
                 if(m_mainThemeMusic.getStatus() != sf::SoundSource::Status::Playing)
                 {
                     m_mainThemeMusic.play();
