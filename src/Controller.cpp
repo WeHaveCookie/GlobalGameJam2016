@@ -205,7 +205,7 @@ int Controller::start()
                 }
             }
 
-            if(sf::Joystick::isButtonPressed(0,2))
+            if(sf::Joystick::isButtonPressed(0,2) || sf::Keyboard::isKeyPressed(sf::Keyboard::X))
             { // X button
                 timeSinceLastUpdateEvent = sf::Time::Zero;
                 if(m_displayMenu)
