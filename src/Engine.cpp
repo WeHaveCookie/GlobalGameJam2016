@@ -39,14 +39,17 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion, bool collisio
     }
 
     sf::Vector2f realMotion;
+    MovingState st;
     if(abs(motion.x) > abs(motion.y))
     {
         if(motion.x > 0)
         {
             realMotion.x = 1.0f;
+            st = MovingState::RIGHT;
         } else if (motion.x < 0)
         {
             realMotion.x = -1.0f;
+            st = MovingState::LEFT;
         } else
         {
             realMotion.x = 0.0f;
@@ -56,9 +59,11 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion, bool collisio
         if(motion.y > 0)
         {
             realMotion.y = 1.0f;
+            st = MovingState::DOWN;
         } else if (motion.y < 0)
         {
             realMotion.y = -1.0f;
+            st = MovingState::UP;
         } else
         {
             realMotion.y = 0.0f;
@@ -70,10 +75,52 @@ bool Engine::move(DrawableObject* obj, const sf::Vector2f& motion, bool collisio
 
     if(m_level->getTypeOfLevelCasesAt(newPosition) == TileType::BLOCKING)
     { // On block !
+        //obj->setState(st);
         return false;
     } else
     {
         obj->move(realMotion);
+        return true;
+    }
+}
+
+bool Engine::dash(DrawableObject* obj)
+{
+    sf::Vector2f realMotion;
+    switch(obj->getState())
+    {
+        case MovingState::LEFT:
+            realMotion.x = -2.0;
+            realMotion.y = 0.0;
+            break;
+        case MovingState::RIGHT:
+            realMotion.x = 2.0;
+            realMotion.y = 0.0;
+            break;
+        case MovingState::UP:
+            realMotion.x = 0.0;
+            realMotion.y = -2.0;
+            break;
+        case MovingState::DOWN:
+            realMotion.x = 0.0;
+            realMotion.y = 2.0;
+            break;
+        default:
+            realMotion.x = 0.0;
+            realMotion.y = 0.0;
+            break;
+    }
+
+    int initPos = obj->getPositionInWorld();
+    int newPosition = initPos + realMotion.x + realMotion.y*(PATTERN_WIDTH*PATTERN_NBR);
+
+    if(m_level->getTypeOfLevelCasesAt(newPosition) == TileType::BLOCKING)
+    { // On block !
+        return false;
+    } else
+    {
+        std::cout << "On dash ! " << std::endl;
+        obj->dash();
         return true;
     }
 }

@@ -24,7 +24,6 @@ Character::Character(std::string path, Controller* controller)
     m_endAnimationDead = false;
     m_movingState = MovingState::IDLE;
     m_controller = controller;
-    m_runeCounter = 0;
     build();
 }
 
@@ -79,6 +78,39 @@ void Character::move(sf::Vector2f motion)
         m_onMove = true;
         m_motion = motion*(float)SPRITE_HEIGHT;
     }
+}
+
+void Character::dash()
+{
+    switch(m_movingState)
+        {
+            case IDLE :
+                // Intentionnal Fallthrought
+            case RIGHT :
+                std::cout << "Dash a droite" << std::endl;
+                m_positionInWorld += 2;
+                break;
+            case LEFT :
+                std::cout << "Dash a gauche" << std::endl;
+                m_positionInWorld -= 2;
+                break;
+            case DOWN :
+                std::cout << "Dash en bas" << std::endl;
+                m_positionInWorld += 2*PATTERN_WIDTH*PATTERN_NBR;
+                break;
+            case UP :
+                std::cout << "Dash en haut" << std::endl;
+                m_positionInWorld -= 2*PATTERN_WIDTH*PATTERN_NBR;
+                break;
+            default:
+                break;
+        }
+        m_animationCounter = 0;
+        m_onMove = false;
+        m_position = sf::Vector2f((m_positionInWorld%(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_WIDTH,(m_positionInWorld/(PATTERN_WIDTH*PATTERN_NBR))*SPRITE_HEIGHT);
+        m_controller->getRune(m_positionInWorld);
+        //updatePosition();
+        m_sprite.setPosition(m_position);
 }
 
 void Character::updatePosition()

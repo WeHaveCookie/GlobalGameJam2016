@@ -1,6 +1,5 @@
 #ifndef CASE_HPP
 #define CASE_HPP
-#include "Structure.hpp"
 #include "DrawableObject.hpp"
 #include "Constante.hpp"
 

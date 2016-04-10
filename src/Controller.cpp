@@ -53,6 +53,7 @@ int Controller::start()
 	sf::Vector2f speed = sf::Vector2f(0.f,0.f);
     bool startPressed = false;
     bool reload = false;
+    bool m_dash = false;
 
 	sf::Clock tickClock;
 	sf::Time timeSinceLastUpdate = sf::Time::Zero;
@@ -168,7 +169,23 @@ int Controller::start()
                 m_player->setSpeed(m_speedPlayer);
                 m_sprint->decrease();
             }
+
+            if(sf::Joystick::getAxisPosition(0, sf::Joystick::Z) < -50.0)
+            {
+                if(!m_dash)
+                {
+                    m_engine->dash(m_player);
+                    m_dash = true;
+                }
+            }
+            if(sf::Joystick::getAxisPosition(0, sf::Joystick::Z) > -10.0)
+            {
+                m_dash = false;
+            }
         }
+
+
+
 
          if(!sf::Joystick::isButtonPressed(0,7) && !sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
          {
@@ -246,10 +263,11 @@ int Controller::start()
             // Setting Menu
             m_displayMenu = true;
             m_menu->setEnable(true);
+            m_victory = false;
 
             startPressed = false;
             m_endMusic.stop();
-
+            m_dash = false;
             reload = false;
         } else if(m_displayMenu && m_player->isAlive())
         { // Display Menu
@@ -381,6 +399,8 @@ void Controller::init()
     }
 
     m_exhaust = 0.0;
+
+    m_runes.clear();
 }
 
 void Controller::growSpeed()

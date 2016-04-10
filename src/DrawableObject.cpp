@@ -12,6 +12,10 @@ void DrawableObject::move(sf::Vector2f motion)
 {
 }
 
+void DrawableObject::dash()
+{
+}
+
 void DrawableObject::draw(sf::RenderWindow* window)
 {
 }

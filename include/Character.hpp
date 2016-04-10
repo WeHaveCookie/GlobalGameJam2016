@@ -3,8 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include "Constante.hpp"
 #include "DrawableObject.hpp"
-#include "Structure.hpp"
 #include "Controller.hpp"
+#include "Structure.hpp"
 
 class Controller;
 
@@ -18,8 +18,10 @@ public:
     void draw(sf::RenderWindow* window);
     void update(sf::RenderWindow* window);
     void move(sf::Vector2f motion);
+    void dash();
     void updateAnimation();
     void setAlive(bool b);
+
 
     // Inline
     inline sf::Sprite getSprite() {return m_sprite;}
@@ -28,7 +30,7 @@ public:
     inline bool isAlive() {return m_alive;}
     inline bool endAnimateDead() {return m_endAnimationDead;}
     inline void setEndAnimateDead(bool b) {m_endAnimationDead = b;}
-    inline MovingState getState() {return m_movingState;}
+
 
 protected:
 private:
@@ -48,7 +50,7 @@ private:
     bool m_endAnimationDead;
 
     // Animate
-    MovingState m_movingState;
+
     std::vector<sf::Sprite> m_animationLEFT;
     std::vector<sf::Sprite> m_animationRIGHT;
     std::vector<sf::Sprite> m_animationUP;
@@ -62,8 +64,6 @@ private:
 	sf::Time m_duration;
 
 	Controller* m_controller;
-	int m_runeCounter;
-
 };
 
 #endif // CHARACTER_HPP

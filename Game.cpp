@@ -7,7 +7,7 @@
 
 int main()
 {
-    sf::RenderWindow* window = new sf::RenderWindow(sf::VideoMode::getDesktopMode(), "Soul Spark", sf::Style::Default | sf::Style::Fullscreen);
+    sf::RenderWindow* window = new sf::RenderWindow(/*sf::VideoMode::getDesktopMode()*/ sf::VideoMode(1920,1080), "Soul Spark", sf::Style::Default/* | sf::Style::Fullscreen*/);
     window->setFramerateLimit(60);
     window->setVerticalSyncEnabled(true);
     srand(time(NULL));

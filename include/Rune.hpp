@@ -3,8 +3,6 @@
 #include <time.h>
 #include "DrawableObject.hpp"
 #include "Constante.hpp"
-#include "Structure.hpp"
-
 
 class Rune : public DrawableObject
 {
